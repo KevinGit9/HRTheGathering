@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HRTheGathering.Cards
 {
-    internal class SpellCard
+    internal class SpellCard : Card
     {
     }
 }
