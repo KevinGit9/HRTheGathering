@@ -5,7 +5,7 @@ namespace HRTheGathering.Cards
     public abstract class Card
     {
         int Id { get; set; }
-        string Name { get; set; }
+        public string Name { get; set; }
         int Cost { get; set; }
         public enum Type
         {
@@ -25,6 +25,5 @@ namespace HRTheGathering.Cards
         }
         public int CopiesInDeck { get; set; }
 
-        void UpdateStatus();
     }
 }

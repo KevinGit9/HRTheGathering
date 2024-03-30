@@ -1,4 +1,5 @@
 ﻿using HRTheGathering.Cards;
+using HRTheGathering.Observers;
 using HRTheGathering.Players;
 
 namespace HRTheGathering.Board
@@ -9,12 +10,17 @@ namespace HRTheGathering.Board
         private int currentRound;
         private Player player1;
         private Player player2;
+        private PlayerLifeObserver player1LifeObserver;
+        private PlayerLifeObserver player2LifeObserver;
 
-        private Board()
+        public Board()
         {
             currentRound = 0;
             player1 = new Player();
             player2 = new Player();
+
+            player1LifeObserver = new PlayerLifeObserver(player1);
+            player2LifeObserver = new PlayerLifeObserver(player2);
         }
 
         public static Board Instance
