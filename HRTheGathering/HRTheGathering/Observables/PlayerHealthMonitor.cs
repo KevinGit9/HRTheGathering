@@ -2,21 +2,30 @@
 
 namespace HRTheGathering.Observables
 {
-    public class PlayerHealthMonitor : IObservable<Player>
+    public class PlayerHealthMonitor : IObservable<int>
     {
-        List<IObserver<Player>> observers;
+        private List<IObserver<int>> observers;
 
         public PlayerHealthMonitor()
         {
-            observers = new List<IObserver<Player>>();
+            observers = new List<IObserver<int>>();
+        }
+
+        public IDisposable Subscribe(IObserver<int> observer)
+        {
+            if (!observers.Contains(observer))
+                observers.Add(observer);
+                        Console.WriteLine($"Observer subscribed: {observer.GetType().Name}");
+
+            return new Unsubscriber(observers, observer);
         }
 
         private class Unsubscriber : IDisposable
         {
-            private List<IObserver<Player>> _observers;
-            private IObserver<Player> _observer;
+            private List<IObserver<int>> _observers;
+            private IObserver<int> _observer;
 
-            public Unsubscriber(List<IObserver<Player>> observers, IObserver<Player> observer)
+            public Unsubscriber(List<IObserver<int>> observers, IObserver<int> observer)
             {
                 this._observers = observers;
                 this._observer = observer;
@@ -26,14 +35,6 @@ namespace HRTheGathering.Observables
             {
                 if (!(_observer == null)) _observers.Remove(_observer);
             }
-        }
-
-        public IDisposable Subscribe(IObserver<Player> observer)
-        {
-            if (!observers.Contains(observer))
-                observers.Add(observer);
-
-            return new Unsubscriber(observers, observer);
         }
     }
 }

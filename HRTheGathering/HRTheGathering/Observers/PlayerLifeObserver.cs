@@ -35,14 +35,21 @@ namespace HRTheGathering.Observers
 
         public void OnError(Exception error)
         {
+            Console.WriteLine($"Error: {error}");
             // Do nothing
         }
 
         public void OnNext(int healthChange)
         {
+            Console.WriteLine("entered on next");
             // Change player HP based on Damage taken or Healing received
             _player.HP += healthChange;
             Console.WriteLine($"{_player.Name} life updated: {_player.HP}");
+
+            if (_player.HP <= 0 )
+            {
+                // End the game
+            }
         }
     }
 }

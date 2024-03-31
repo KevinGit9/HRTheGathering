@@ -1,4 +1,5 @@
 ﻿using HRTheGathering.Cards;
+using HRTheGathering.Observables;
 using HRTheGathering.Observers;
 using HRTheGathering.Players;
 
@@ -10,8 +11,8 @@ namespace HRTheGathering.Board
         private int currentRound;
         private Player player1;
         private Player player2;
-        private PlayerLifeObserver player1LifeObserver;
-        private PlayerLifeObserver player2LifeObserver;
+        public PlayerLifeObserver player1LifeObserver;
+        public PlayerLifeObserver player2LifeObserver;
 
         public Board()
         {
@@ -19,12 +20,14 @@ namespace HRTheGathering.Board
             player1 = new Player();
             player2 = new Player();
 
+            var provider = new PlayerHealthMonitor();
+
             player1LifeObserver = new PlayerLifeObserver(player1);
             player2LifeObserver = new PlayerLifeObserver(player2);
 
             // Subscribe the observers to the players
-            // player1LifeObserver.Subscribe(player1);
-            // player2LifeObserver.Subscribe(player2);
+            player1LifeObserver.Subscribe(provider);
+            player2LifeObserver.Subscribe(provider);
         }
 
         public static Board Instance
@@ -49,15 +52,20 @@ namespace HRTheGathering.Board
         {
             // Shuffle decks of each player
             // Players draw cards up until the MaxCardsInHand (7)
-            Console.WriteLine(player1.HP);
-            Console.WriteLine(player2.HP);
+
+
+            /*
+            // Simulate damage
+            //
+            */
+            Console.WriteLine($"player 1 HP: {player1.HP}");
+            Console.WriteLine($"player 2 HP: {player2.HP}");
             Console.WriteLine("Press enter to attack player 1 with 5 damage...");
             Console.ReadKey();
 
             // Hit player 1 with 5 damage
-            int damageAmount = 5; // Let's say the damage amount is 10
+            int damageAmount = 5;
             player1.HP -= damageAmount;
-
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
         }
