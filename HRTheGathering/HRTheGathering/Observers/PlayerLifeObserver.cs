@@ -10,6 +10,7 @@ namespace HRTheGathering.Observers
 {
     class PlayerLifeObserver : IObserver<int>
     {
+        private IDisposable unsubscriber;
         private Player _player;
 
         public PlayerLifeObserver(Player player)
@@ -17,20 +18,30 @@ namespace HRTheGathering.Observers
             _player = player;
         }
 
+        public virtual void Subscribe(IObservable<int> provider)
+        {
+            unsubscriber = provider.Subscribe(this);
+        }
+
+        public virtual void Unsubscribe()
+        {
+            unsubscriber.Dispose();
+        }
+
         public void OnCompleted()
         {
-            // Optionally implement logic for completion of observation
+            Console.WriteLine("Health changed won't be observerd anymore.");
         }
 
         public void OnError(Exception error)
         {
-            // Optionally handle errors
+            // Do nothing
         }
 
         public void OnNext(int healthChange)
         {
-            // Example: Update player's health based on the received health change
-            _player.HP += healthChange; // Assuming healthChange represents a change in health (e.g., damage or healing)
+            // Change player HP based on Damage taken or Healing received
+            _player.HP += healthChange;
             Console.WriteLine($"{_player.Name} life updated: {_player.HP}");
         }
     }

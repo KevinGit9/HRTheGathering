@@ -6,7 +6,7 @@ namespace HRTheGathering.Board
 {
     class Board
     {
-        private static Board instance;
+        private static Board instance = new Board();
         private int currentRound;
         private Player player1;
         private Player player2;
@@ -21,6 +21,10 @@ namespace HRTheGathering.Board
 
             player1LifeObserver = new PlayerLifeObserver(player1);
             player2LifeObserver = new PlayerLifeObserver(player2);
+
+            // Subscribe the observers to the players
+            // player1LifeObserver.Subscribe(player1);
+            // player2LifeObserver.Subscribe(player2);
         }
 
         public static Board Instance
@@ -45,7 +49,17 @@ namespace HRTheGathering.Board
         {
             // Shuffle decks of each player
             // Players draw cards up until the MaxCardsInHand (7)
+            Console.WriteLine(player1.HP);
+            Console.WriteLine(player2.HP);
+            Console.WriteLine("Press enter to attack player 1 with 5 damage...");
+            Console.ReadKey();
 
+            // Hit player 1 with 5 damage
+            int damageAmount = 5; // Let's say the damage amount is 10
+            player1.HP -= damageAmount;
+
+            Console.WriteLine("Press enter to continue...");
+            Console.ReadKey();
         }
 
         public void StartRound()
@@ -87,11 +101,15 @@ namespace HRTheGathering.Board
         public void EndGame()
         {
             // End the game by closing the instance and declaring a winner
-            
+
             // Game ends by:
             // if player HP <= 0
             // if player Deck.Count <= 0
             // if player forfeits the game
+
+            // Unsubscribe from all observers
+            player1LifeObserver.Unsubscribe();
+            player2LifeObserver.Unsubscribe();
         }
 
     }

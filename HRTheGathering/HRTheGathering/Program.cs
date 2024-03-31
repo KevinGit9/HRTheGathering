@@ -1,2 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using HRTheGathering.Board;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Board board = Board.Instance;
+
+        // Start the game
+        board.StartGame();
+    }
+}
