@@ -77,7 +77,7 @@ namespace HRTheGathering.Cards
 
             if (attacker != null && defender == null)
             {
-                defendingPlayer.HP -= attacker.Attack;
+                defendingPlayer.Health -= attacker.Attack;
             }
             else if (attacker != null && defender != null)
             {

@@ -12,7 +12,6 @@ namespace HRTheGathering.Board
         private Player player2;
         private PlayerHealthObserver player1LifeObserver;
         private PlayerHealthObserver player2LifeObserver;
-        private CardFactory cardFactory;
 
         public Board()
         {
@@ -23,13 +22,22 @@ namespace HRTheGathering.Board
             player1LifeObserver = new PlayerHealthObserver();
             player2LifeObserver = new PlayerHealthObserver();
 
+            var player1HandObserver = new PlayerHandObserver();
+            var player2HandObserver = new PlayerHandObserver();
+
+
             player1.Attach(player1LifeObserver, player1.HealthObservers);
+            player1.Attach(player1HandObserver, player1.HandObservers);
+
+            
             player2.Attach(player2LifeObserver, player2.HealthObservers);
+            player2.Attach(player2HandObserver, player2.HandObservers);
 
 
             // Subscribe the observers to the players
             // player1LifeObserver.Subscribe(player1);
             // player2LifeObserver.Subscribe(player2);
+            Card card = new InstantCard();
         }
 
         public static Board Instance
@@ -63,6 +71,10 @@ namespace HRTheGathering.Board
             int damageAmount = 5; // Let's say the damage amount is 10
             player1.Health -= damageAmount;
 
+            Console.WriteLine("Press enter to draw a card for player 1...");
+            Console.ReadKey();
+
+            player1.DrawCard();
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
         }

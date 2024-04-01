@@ -1,6 +1,5 @@
 ﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
-using System.ComponentModel.DataAnnotations;
 
 namespace HRTheGathering.Players
 {
@@ -46,21 +45,23 @@ namespace HRTheGathering.Players
 
 
         // Game methods
-        // public Card DrawCard()
-        // {
-        //     return new PermanentCard();
-        // }
-
-        public void DrawCard(Card card)
+        public void DrawCard()
         {
-            this.CardsInHand.Add(card);
-            this.Deck.Remove(card);
+            var factory = new CardFactory();
+            Card card = factory.CreateLandCard();
+            Hand = Hand.Concat(new[] { card }).ToList();
         }
+
+        //public void DrawCard(Card card)
+        //{
+        //    this.Hand.Add(card);
+        //    this.Deck.Remove(card);
+        //}
 
         public void UseCard(Card card)
         {
             this.CardsOnBoard.Add(card);
-            this.CardsInHand.Remove(card);
+            this.Hand.Remove(card);
         }
 
         public void DiscardCard(Card card)

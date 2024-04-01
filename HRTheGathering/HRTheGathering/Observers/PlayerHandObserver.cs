@@ -5,16 +5,13 @@ namespace HRTheGathering.Observers
 {
     class PlayerHandObserver : IGameObserver<List<Card>>
     {
-        private Player _player;
-
-        public PlayerHandObserver(Player player)
+        public void Update(List<Card> newHand)
         {
-            _player = player;
-        }
-
-        public void Update(List<Card> card)
-        {
-     
+            Console.WriteLine("Player hand changed:");
+            foreach (var card in newHand)
+            {
+                Console.WriteLine(card.Name);
+            }
         }
     }
 }
