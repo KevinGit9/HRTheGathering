@@ -9,14 +9,11 @@ namespace HRTheGathering.Board
         private int currentTurn;
         private Player player1;
         private Player player2;
-        private List<Card> player1Cards;
-        private List<Card> player2Cards;
+        private CardFactory cardFactory;
 
         private Board()
         {
-            currentTurn = 0;
-            player1Cards = new List<Card>();
-            player2Cards = new List<Card>();
+            currentTurn = 0;         
             player1 = new Player();
             player2 = new Player();
         }
@@ -33,14 +30,31 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void AddCard(Card card, List<Card> playerCards)
+        public void ClearAllTurnedLandCards(List<Card> playerCards)
         {
-            playerCards.Add(card);
+            foreach (Card card in playerCards)
+            {
+                if (card.CardType == Card.Type.Land)
+                {
+                    LandCard landCard = (LandCard)card;
+                    landCard.IsTurned = false;
+                }
+            }
         }
 
-        public void RemoveCard(Card card, List<Card> playerCards)
+        public List<LandCard> GetAllTurnedLandCards(List<Card> playerCards)
         {
-            playerCards.Remove(card);
+            List<LandCard> TurnedLandCards = new List<LandCard>();
+
+            foreach (Card card in playerCards)
+            {
+                if (card.CardType == Card.Type.Land)
+                {
+                    LandCard landCard = (LandCard)card;
+                    TurnedLandCards.Add(landCard);
+                }
+            }
+            return TurnedLandCards;
         }
 
         public void EndGame()

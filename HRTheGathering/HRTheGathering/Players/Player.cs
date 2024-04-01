@@ -29,6 +29,23 @@ namespace HRTheGathering.Players
                 }
             }
         }
-            
+
+        public void DrawCard(Card card)
+        {
+            this.CardsInHand.Add(card);
+            this.Deck.Remove(card);
+        }
+
+        public void UseCard(Card card)
+        {
+            this.CardsOnBoard.Add(card);
+            this.CardsInHand.Remove(card);
+        }
+
+        public void DiscardCard(Card card)
+        {
+            this.DiscardPile.Add(card);
+            this.CardsOnBoard.Remove(card);
+        }
     }
 }
