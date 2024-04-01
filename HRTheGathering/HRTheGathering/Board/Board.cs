@@ -10,8 +10,8 @@ namespace HRTheGathering.Board
         private int currentRound;
         private Player player1;
         private Player player2;
-        private PlayerLifeObserver player1LifeObserver;
-        private PlayerLifeObserver player2LifeObserver;
+        private PlayerHealthObserver player1LifeObserver;
+        private PlayerHealthObserver player2LifeObserver;
 
         public Board()
         {
@@ -19,8 +19,12 @@ namespace HRTheGathering.Board
             player1 = new Player();
             player2 = new Player();
 
-            player1LifeObserver = new PlayerLifeObserver(player1);
-            player2LifeObserver = new PlayerLifeObserver(player2);
+            player1LifeObserver = new PlayerHealthObserver();
+            player2LifeObserver = new PlayerHealthObserver();
+
+            player1.Attach(player1LifeObserver, player1.HealthObservers);
+            player2.Attach(player2LifeObserver, player2.HealthObservers);
+
 
             // Subscribe the observers to the players
             // player1LifeObserver.Subscribe(player1);
@@ -49,14 +53,14 @@ namespace HRTheGathering.Board
         {
             // Shuffle decks of each player
             // Players draw cards up until the MaxCardsInHand (7)
-            Console.WriteLine(player1.HP);
-            Console.WriteLine(player2.HP);
+            Console.WriteLine(player1.Health);
+            Console.WriteLine(player2.Health);
             Console.WriteLine("Press enter to attack player 1 with 5 damage...");
             Console.ReadKey();
 
             // Hit player 1 with 5 damage
             int damageAmount = 5; // Let's say the damage amount is 10
-            player1.HP -= damageAmount;
+            player1.Health -= damageAmount;
 
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
@@ -108,8 +112,8 @@ namespace HRTheGathering.Board
             // if player forfeits the game
 
             // Unsubscribe from all observers
-            player1LifeObserver.Unsubscribe();
-            player2LifeObserver.Unsubscribe();
+            player1.Detach(player1LifeObserver, player1.HealthObservers);
+            player2.Detach(player2LifeObserver, player2.HealthObservers);
         }
 
     }
