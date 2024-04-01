@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace HRTheGathering.Cards
 {
-    internal class PermanentCard : Card
+    public class InstantCard : Card
     {
-        public PermanentCard() 
-        { 
-
-        }
     }
 }

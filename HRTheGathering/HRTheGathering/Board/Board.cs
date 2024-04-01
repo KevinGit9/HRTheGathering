@@ -12,6 +12,7 @@ namespace HRTheGathering.Board
         private Player player2;
         private PlayerHealthObserver player1LifeObserver;
         private PlayerHealthObserver player2LifeObserver;
+        private CardFactory cardFactory;
 
         public Board()
         {
@@ -114,6 +115,33 @@ namespace HRTheGathering.Board
             // Unsubscribe from all observers
             player1.Detach(player1LifeObserver, player1.HealthObservers);
             player2.Detach(player2LifeObserver, player2.HealthObservers);
+        }
+
+        public void ClearAllTurnedLandCards(List<Card> playerCards)
+        {
+            foreach (Card card in playerCards)
+            {
+                if (card.CardType == Card.Type.Land)
+                {
+                    LandCard landCard = (LandCard)card;
+                    landCard.IsTurned = false;
+                }
+            }
+        }
+
+        public List<LandCard> GetAllTurnedLandCards(List<Card> playerCards)
+        {
+            List<LandCard> TurnedLandCards = new List<LandCard>();
+
+            foreach (Card card in playerCards)
+            {
+                if (card.CardType == Card.Type.Land)
+                {
+                    LandCard landCard = (LandCard)card;
+                    TurnedLandCards.Add(landCard);
+                }
+            }
+            return TurnedLandCards;
         }
 
     }

@@ -46,9 +46,27 @@ namespace HRTheGathering.Players
 
 
         // Game methods
-        public Card DrawCard()
+        // public Card DrawCard()
+        // {
+        //     return new PermanentCard();
+        // }
+
+        public void DrawCard(Card card)
         {
-            return new PermanentCard();
+            this.CardsInHand.Add(card);
+            this.Deck.Remove(card);
+        }
+
+        public void UseCard(Card card)
+        {
+            this.CardsOnBoard.Add(card);
+            this.CardsInHand.Remove(card);
+        }
+
+        public void DiscardCard(Card card)
+        {
+            this.DiscardPile.Add(card);
+            this.CardsOnBoard.Remove(card);
         }
 
         // Observer methods
