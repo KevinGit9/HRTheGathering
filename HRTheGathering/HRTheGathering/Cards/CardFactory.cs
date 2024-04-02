@@ -44,5 +44,49 @@ namespace HRTheGathering.Cards
             // Create a new Land Card using the random generated values
             return new LandCard { Name = randomName, Cost = 0, CardColor = randomColor, IsTurned = false };
         }
+
+        public Card CreateCreatureCard()
+        {
+            return new CreatureCard { };
+
+        }
+        public Card CreateSpellCard()
+        {
+            return new SpellCard { };
+
+        }
+
+        public Card CreateInstantCard()
+        {
+            return new InstantCard { };
+
+        }
+
+        public List<Card> CreateDeck(int numberOfLands = 12, int numberOfCreatures = 10, int numberOfSpells = 8)
+        {
+            List<Card> deck = new List<Card>();
+
+            for (int i = 0; i < numberOfLands; i++)
+            {
+                deck.Add(CreateLandCard());
+            }
+
+            for (int i = 0; i < numberOfCreatures; i++)
+            {
+                deck.Add(CreateCreatureCard());
+            }
+
+            for (int i = 0; i < numberOfSpells; i++)
+            {
+                if (i % 2 == 0)
+                    // Add Spell Card
+                    deck.Add(CreateSpellCard());
+                else
+                    // Add Instant Card
+                    deck.Add(CreateInstantCard());
+            }
+
+            return deck;
+        }
     }
 }

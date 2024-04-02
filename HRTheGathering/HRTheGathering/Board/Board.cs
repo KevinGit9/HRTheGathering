@@ -12,6 +12,7 @@ namespace HRTheGathering.Board
         private Player player2;
         private PlayerHealthObserver player1LifeObserver;
         private PlayerHealthObserver player2LifeObserver;
+        public CardFactory cardFactory = new CardFactory();
 
         public Board()
         {
@@ -51,12 +52,24 @@ namespace HRTheGathering.Board
         {
             PrepareGame();
             // Add whatever is needed
+
+            RunTests();
         }
 
         public void PrepareGame()
         {
+            // Create decks for both players
+            player1.Deck = cardFactory.CreateDeck();
+            player2.Deck = cardFactory.CreateDeck();
+
             // Shuffle decks of each player
             // Players draw cards up until the MaxCardsInHand (7)
+        }
+
+        public void RunTests()
+        {
+
+            // Tests
             Console.WriteLine(player1.Health);
             Console.WriteLine(player2.Health);
             Console.WriteLine("Press enter to attack player 1 with 5 damage...");
