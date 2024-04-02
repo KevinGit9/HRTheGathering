@@ -1,18 +1,15 @@
-﻿using HRTheGathering.Cards;
+﻿using System.Collections.Generic;
+using HRTheGathering.Cards;
 using HRTheGathering.Observers;
 
 namespace HRTheGathering.Players
 {
     public class Player
     {
-        private int health { get; set; } = 10;
+        private int health = 10;
         private List<Card> hand = new List<Card>();
-        private List<IGameObserver<int>> healthObservers = new List<IGameObserver<int>>();
-        private List<IGameObserver<List<Card>>> handObservers = new List<IGameObserver<List<Card>>>();
-
-        public List<IGameObserver<int>> HealthObservers => healthObservers;
-        public List<IGameObserver<List<Card>>> HandObservers => handObservers;
-
+        private Observable<int> healthObservable = new Observable<int>();
+        private Observable<List<Card>> handObservable = new Observable<List<Card>>();
 
         public int Id { get; set; }
         public string? Name { get; set; }
@@ -25,7 +22,7 @@ namespace HRTheGathering.Players
                 if (value != health)
                 {
                     health = value;
-                    NotifyObservers(healthObservers, health);
+                    healthObservable.NotifyObservers(value);
                 }
             }
         }
@@ -36,12 +33,17 @@ namespace HRTheGathering.Players
             set
             {
                 hand = value;
-                NotifyObservers(handObservers, hand);
+                handObservable.NotifyObservers(value);
             }
         }
-        public List<Card> Deck { get; set; } = new List<Card>();
+
+        public List<Card> Deck { get; set; } = new List<Card>(); // Deck has 30 cards
         public List<Card> DiscardPile { get; set; } = new List<Card>(); // Graveyard
         public List<Card> CardsOnBoard { get; set; } = new List<Card>(); // Board
+
+        // Observable properties
+        public Observable<int> HealthObservable => healthObservable;
+        public Observable<List<Card>> HandObservable => handObservable;
 
 
         // Game methods
@@ -51,12 +53,6 @@ namespace HRTheGathering.Players
             Card card = factory.CreateLandCard();
             Hand = Hand.Concat(new[] { card }).ToList();
         }
-
-        //public void DrawCard(Card card)
-        //{
-        //    this.Hand.Add(card);
-        //    this.Deck.Remove(card);
-        //}
 
         public void UseCard(Card card)
         {
@@ -69,25 +65,5 @@ namespace HRTheGathering.Players
             this.DiscardPile.Add(card);
             this.CardsOnBoard.Remove(card);
         }
-
-        // Observer methods
-        public void Attach<T>(IGameObserver<T> observer, List<IGameObserver<T>> observers)
-        {
-            observers.Add(observer);
-        }
-
-        public void Detach<T>(IGameObserver<T> observer, List<IGameObserver<T>> observers)
-        {
-            observers.Remove(observer);
-        }
-
-        private void NotifyObservers<T>(List<IGameObserver<T>> observers, T data)
-        {
-            foreach (var observer in observers)
-            {
-                observer.Update(data);
-            }
-        }
-
     }
 }

@@ -26,18 +26,13 @@ namespace HRTheGathering.Board
             var player2HandObserver = new PlayerHandObserver();
 
 
-            player1.Attach(player1LifeObserver, player1.HealthObservers);
-            player1.Attach(player1HandObserver, player1.HandObservers);
-
-            
-            player2.Attach(player2LifeObserver, player2.HealthObservers);
-            player2.Attach(player2HandObserver, player2.HandObservers);
-
-
             // Subscribe the observers to the players
-            // player1LifeObserver.Subscribe(player1);
-            // player2LifeObserver.Subscribe(player2);
-            Card card = new InstantCard();
+            player1.HealthObservable.Attach(player1LifeObserver);
+            player1.HandObservable.Attach(player1HandObserver);
+
+            player2.HealthObservable.Attach(player2LifeObserver);
+            player2.HandObservable.Attach(player2HandObserver);
+
         }
 
         public static Board Instance
@@ -125,8 +120,8 @@ namespace HRTheGathering.Board
             // if player forfeits the game
 
             // Unsubscribe from all observers
-            player1.Detach(player1LifeObserver, player1.HealthObservers);
-            player2.Detach(player2LifeObserver, player2.HealthObservers);
+            player1.HealthObservable.Detach(player1LifeObserver);
+            player2.HealthObservable.Detach(player2LifeObserver);
         }
 
         public void ClearAllTurnedLandCards(List<Card> playerCards)
