@@ -1,5 +1,4 @@
 ﻿using HRTheGathering.Cards;
-using HRTheGathering.Players;
 
 namespace HRTheGathering.Observers
 {
@@ -10,7 +9,21 @@ namespace HRTheGathering.Observers
             Console.WriteLine("Player hand changed:");
             foreach (var card in newHand)
             {
-                Console.WriteLine(card.Name);
+                if (card is CreatureCard)
+                {
+                    // Cast card to CreatureCard
+                    CreatureCard creatureCard = (CreatureCard)card;
+                    Console.WriteLine($"[{card.CardColor} Creature][{card.Cost}] {card.Name} ({creatureCard.Attack}, {creatureCard.Defense})");
+                }
+                else if (card is LandCard)
+                {
+                    Console.WriteLine($"[{card.CardColor} Land] {card.Name}");
+                }
+                else
+                {
+                    Console.WriteLine($"[{card.Cost}] {card.Name}");
+                }
+
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HRTheGathering.Cards;
+﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
 
 namespace HRTheGathering.Players
@@ -33,10 +32,11 @@ namespace HRTheGathering.Players
             set
             {
                 hand = value;
+                Console.WriteLine("hello");
                 handObservable.NotifyObservers(value);
             }
         }
-
+    
         public List<Card> Deck { get; set; } = new List<Card>(); // Deck has 30 cards
         public List<Card> DiscardPile { get; set; } = new List<Card>(); // Graveyard
         public List<Card> CardsOnBoard { get; set; } = new List<Card>(); // Board
@@ -45,13 +45,38 @@ namespace HRTheGathering.Players
         public Observable<int> HealthObservable => healthObservable;
         public Observable<List<Card>> HandObservable => handObservable;
 
+        public int MaxCardsInHand = 7;
+
 
         // Game methods
-        public void DrawCard()
+        public void ShuffleDeck()
         {
-            var factory = new CardFactory();
-            Card card = factory.CreateLandCard();
-            Hand = Hand.Concat(new[] { card }).ToList();
+            Random rng = new Random();
+            int n = Deck.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                Card value = Deck[k];
+                Deck[k] = Deck[n];
+                Deck[n] = value;
+            }
+        }
+
+        public bool DrawCard()
+        {
+            // if Deck is empty return false to declare a winner
+            if (Deck.Count == 0)
+            {
+                return false;
+            }
+
+            // Remove the top card from the Deck and add it to the Hand
+            Card topCard = Deck[0];
+            Deck.RemoveAt(0);
+            Hand = Hand.Concat(new[] { topCard }).ToList();
+
+            return true;
         }
 
         public void UseCard(Card card)
