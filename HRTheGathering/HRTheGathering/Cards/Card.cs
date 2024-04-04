@@ -5,7 +5,7 @@ namespace HRTheGathering.Cards
     public abstract class Card
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public int Cost { get; set; }
         public int CopiesInDeck { get; set; }
         public IEffect? CardEffect { get; set; }
