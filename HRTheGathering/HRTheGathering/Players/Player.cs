@@ -87,8 +87,9 @@ namespace HRTheGathering.Players
 
         public void DiscardCard(Card card)
         {
-            this.DiscardPile.Add(card);
+            // Add check if its on the board or in the hand
             this.CardsOnBoard.Remove(card);
+            this.DiscardPile.Add(card);
         }
     }
 }
