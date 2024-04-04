@@ -10,7 +10,7 @@ namespace HRTheGathering.Observers
     {
         public void Update(int healthChange)
         {
-            Console.WriteLine("Player health changed to: " + healthChange);
+            Console.WriteLine("Player health changed to: " + healthChange + "\n");
         }
     }
 }

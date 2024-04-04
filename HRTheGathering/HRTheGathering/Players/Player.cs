@@ -7,8 +7,10 @@ namespace HRTheGathering.Players
     {
         private int health = 10;
         private List<Card> hand = new List<Card>();
+        private List<Card> board = new List<Card>();
         private Observable<int> healthObservable = new Observable<int>();
         private Observable<List<Card>> handObservable = new Observable<List<Card>>();
+        private Observable<List<Card>> boardObservable = new Observable<List<Card>>();
 
         public int Id { get; set; }
         public string? Name { get; set; }
@@ -32,18 +34,27 @@ namespace HRTheGathering.Players
             set
             {
                 hand = value;
-                Console.WriteLine("hello");
                 handObservable.NotifyObservers(value);
             }
         }
-    
+
+        public List<Card> CardsOnBoard
+        {
+            get { return board; }
+            set
+            {
+                board = value;
+                boardObservable.NotifyObservers(value);
+            }
+        }
+
         public List<Card> Deck { get; set; } = new List<Card>(); // Deck has 30 cards
         public List<Card> DiscardPile { get; set; } = new List<Card>(); // Graveyard
-        public List<Card> CardsOnBoard { get; set; } = new List<Card>(); // Board
 
         // Observable properties
         public Observable<int> HealthObservable => healthObservable;
         public Observable<List<Card>> HandObservable => handObservable;
+        public Observable<List<Card>> BoardObservable => boardObservable;
 
         public int MaxCardsInHand = 7;
 
@@ -74,15 +85,23 @@ namespace HRTheGathering.Players
             // Remove the top card from the Deck and add it to the Hand
             Card topCard = Deck[0];
             Deck.RemoveAt(0);
-            Hand = Hand.Concat(new[] { topCard }).ToList();
+
+            List<Card> newHand = new List<Card>(Hand);
+            newHand.Add(topCard);
+            Hand = newHand;
 
             return true;
         }
 
         public void UseCard(Card card)
         {
-            this.CardsOnBoard.Add(card);
-            this.Hand.Remove(card);
+            List<Card> newCardsOnBoard = new List<Card>(CardsOnBoard);
+            newCardsOnBoard.Add(card);
+            CardsOnBoard = newCardsOnBoard;
+
+            List<Card> newHand = new List<Card>(Hand);
+            newHand.Remove(card);
+            Hand = newHand; 
         }
 
         public void DiscardCard(Card card)

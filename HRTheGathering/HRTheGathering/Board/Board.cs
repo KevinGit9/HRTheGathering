@@ -17,8 +17,8 @@ namespace HRTheGathering.Board
         public Board()
         {
             currentRound = 0;
-            player1 = new Player();
-            player2 = new Player();
+            player1 = new Player { Name = "Player 1"};
+            player2 = new Player { Name = "Player 2" };
 
             player1LifeObserver = new PlayerHealthObserver();
             player2LifeObserver = new PlayerHealthObserver();
@@ -26,13 +26,19 @@ namespace HRTheGathering.Board
             PlayerHandObserver player1HandObserver = new PlayerHandObserver();
             PlayerHandObserver player2HandObserver = new PlayerHandObserver();
 
+            PlayerBoardObserver player1BoardObserver = new PlayerBoardObserver();
+            PlayerBoardObserver player2BoardObserver =  new PlayerBoardObserver();
 
-            // Subscribe the observers to the players
+
+            // Attach the observers to the players
             player1.HealthObservable.Attach(player1LifeObserver);
             player1.HandObservable.Attach(player1HandObserver);
+            player1.BoardObservable.Attach(player1BoardObserver);
 
             player2.HealthObservable.Attach(player2LifeObserver);
             player2.HandObservable.Attach(player2HandObserver);
+            player2.BoardObservable.Attach(player2BoardObserver);
+
 
         }
 
@@ -52,6 +58,13 @@ namespace HRTheGathering.Board
         {
             PrepareGame();
             // Add whatever is needed
+
+            Console.WriteLine("Done preparing the game - press any key to start the game...");
+            Console.ReadKey();
+            while(true)
+            {
+                StartRound();
+            }
 
             RunTests();
         }
@@ -94,7 +107,7 @@ namespace HRTheGathering.Board
             publisher.UnsubscribeDefenseDecrease(creature2);
             publisher.DecreaseDefenseOfSubscribedCreatures(5);
             Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
-            Console.ReadLine();
+            Console.ReadKey();
 
             // Tests
             Console.WriteLine(player1.Health);
@@ -142,10 +155,27 @@ namespace HRTheGathering.Board
             // Player can play cards
             // Player can attack
             // Opposing player can assign a defender and/or play an instant spell/card
+         
+            // If the player has a Land Card, play it
+            // Play a land card, make sure it's turned
+            LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
+            if (landCard != null)
+            {
+                player.UseCard(landCard);
+            }
+            
+            if (player.Hand.Any(card => card is CreatureCard))
+            {
+                // Check if player has enough lands to play creature
+            }
 
 
             // Ending:
             // Player must discard cards from their hand until the cards in hand dont exceed MaxCardsInHand (7)
+
+            EndTurn();
+            Console.WriteLine($"This is the end of the turn of {player.Name} - press any key to continue...");
+            Console.ReadKey();
         }
 
         public void EndTurn()
@@ -156,6 +186,19 @@ namespace HRTheGathering.Board
             // End situation Player1: 4 cards in hand, 3 used lands on the floor, a permanent 
             // creature played in a state of attack, full life.
             // End situation Player2: 6 cards, 1 land on the floor, 5 life.
+            int numberOfLands;
+
+            Console.WriteLine($"{player1.Name}:");
+            Console.WriteLine($"Cards in hand: {player1.Hand.Count}");
+            numberOfLands = player1.CardsOnBoard.Count(card => card is LandCard);
+            Console.WriteLine($"Lands in field: {numberOfLands}");
+            Console.WriteLine($"Lives: {player1.Health}\n");
+
+            Console.WriteLine($"{player2.Name}:");
+            Console.WriteLine($"Cards in hand: {player2.Hand.Count}");
+            numberOfLands = player2.CardsOnBoard.Count(card => card is LandCard);
+            Console.WriteLine($"Lands in field: {numberOfLands}");
+            Console.WriteLine($"Lives: {player2.Health}\n");
         }
 
         public void EndGame(Player player)

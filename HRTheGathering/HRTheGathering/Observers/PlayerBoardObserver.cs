@@ -1,13 +1,18 @@
 ﻿using HRTheGathering.Cards;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace HRTheGathering.Observers
 {
-    class PlayerHandObserver : IGameObserver<List<Card>>
+    class PlayerBoardObserver : IGameObserver<List<Card>>
     {
-        public void Update(List<Card> newHand)
+        public void Update(List<Card> cardsOnField)
         {
-            Console.WriteLine("Player hand changed:");
-            foreach (var card in newHand)
+            Console.WriteLine("Player field changed:");
+            foreach (var card in cardsOnField)
             {
                 if (card is CreatureCard)
                 {
