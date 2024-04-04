@@ -12,6 +12,10 @@ namespace HRTheGathering.Board
         private Player player2;
         private PlayerHealthObserver player1LifeObserver;
         private PlayerHealthObserver player2LifeObserver;
+        private PlayerHandObserver player1HandObserver;
+        private PlayerHandObserver player2HandObserver;
+        private PlayerBoardObserver player1BoardObserver;
+        private PlayerBoardObserver player2BoardObserver;
         public CardFactory cardFactory = new CardFactory();
 
         public Board()
@@ -23,11 +27,11 @@ namespace HRTheGathering.Board
             player1LifeObserver = new PlayerHealthObserver();
             player2LifeObserver = new PlayerHealthObserver();
 
-            PlayerHandObserver player1HandObserver = new PlayerHandObserver();
-            PlayerHandObserver player2HandObserver = new PlayerHandObserver();
+            player1HandObserver = new PlayerHandObserver();
+            player2HandObserver = new PlayerHandObserver();
 
-            PlayerBoardObserver player1BoardObserver = new PlayerBoardObserver();
-            PlayerBoardObserver player2BoardObserver =  new PlayerBoardObserver();
+            player1BoardObserver = new PlayerBoardObserver();
+            player2BoardObserver =  new PlayerBoardObserver();
 
 
             // Attach the observers to the players
@@ -64,6 +68,7 @@ namespace HRTheGathering.Board
             while(true)
             {
                 StartRound();
+                break;
             }
 
             RunTests();
@@ -223,9 +228,15 @@ namespace HRTheGathering.Board
             // if player Deck.Count <= 0
             // if player forfeits the game
 
-            // Unsubscribe from all observers
+            // Detach all observers
             player1.HealthObservable.Detach(player1LifeObserver);
+            player1.HandObservable.Detach(player1HandObserver);
+            player1.BoardObservable.Detach(player1BoardObserver);
+
             player2.HealthObservable.Detach(player2LifeObserver);
+            player2.HandObservable.Detach(player2HandObserver);
+            player1.BoardObservable.Detach(player2BoardObserver);
+
         }
 
         public void ClearAllTurnedLandCards(List<Card> playerCards)
