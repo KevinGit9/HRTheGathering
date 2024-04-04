@@ -37,7 +37,7 @@ namespace HRTheGathering.Cards
             }
         }
 
-        public CreatureCard GetAttackerCreatureCard(List<Card> playerCards)
+        public CreatureCard? GetAttackerCreatureCard(List<Card> playerCards)
         {
             foreach (Card card in playerCards)
             {
@@ -53,7 +53,7 @@ namespace HRTheGathering.Cards
             return null;
         }
 
-        public CreatureCard GetDefenderCreatureCard(List<Card> playerCards)
+        public CreatureCard? GetDefenderCreatureCard(List<Card> playerCards)
         {
             foreach (Card card in playerCards)
             {
@@ -84,6 +84,16 @@ namespace HRTheGathering.Cards
                 defender.Defense -= attacker.Attack;
                 attacker.Defense -= defender.Attack;
             }
+        }
+
+        public void DecreaseDefense(int amount)
+        {
+            this.Defense -= amount;
+        }
+
+        public void DecreaseAttack(int amount)
+        {
+            this.Attack -= amount;
         }
     }
 }

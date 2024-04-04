@@ -67,7 +67,7 @@ namespace HRTheGathering.Board
             player2.ShuffleDeck();
 
             // Players draw cards up until the MaxCardsInHand (7
-            int maxCardsInHand = 3;
+            int maxCardsInHand = 7;
             for (int i = 0; i < maxCardsInHand; i++)
             {
                 player1.DrawCard();
@@ -77,6 +77,25 @@ namespace HRTheGathering.Board
 
         public void RunTests()
         {
+            // Pub Sub Test
+            Publisher publisher = new Publisher();
+
+            CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
+            CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
+            player1.CardsOnBoard.Add(creature1);
+            player1.CardsOnBoard.Add(creature2);
+            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+
+            publisher.SubscribeDefenseDecrease(creature1);
+            publisher.SubscribeDefenseDecrease(creature2);
+            publisher.DecreaseDefenseOfSubscribedCreatures(5);
+            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+
+            publisher.UnsubscribeDefenseDecrease(creature2);
+            publisher.DecreaseDefenseOfSubscribedCreatures(5);
+            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+            Console.ReadLine();
+
             // Tests
             Console.WriteLine(player1.Health);
             Console.WriteLine(player2.Health);
