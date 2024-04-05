@@ -318,3 +318,5 @@ namespace HRTheGathering.Board
 
     }
 }
+
+// TODO: Add pub sub channel for player1 and another one for player2
