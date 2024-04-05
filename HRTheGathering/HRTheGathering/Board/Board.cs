@@ -1,6 +1,7 @@
 ﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
 using HRTheGathering.Players;
+using HRTheGathering.Publishers;
 
 namespace HRTheGathering.Board
 {
@@ -61,6 +62,8 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
+            RunTests();
+
             PrepareGame();
             // Add whatever is needed
 
@@ -71,7 +74,6 @@ namespace HRTheGathering.Board
                 StartRound();
             }
 
-            //RunTests();
         }
 
         public void PrepareGame()
@@ -102,16 +104,16 @@ namespace HRTheGathering.Board
             CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
             player1.CardsOnBoard.Add(creature1);
             player1.CardsOnBoard.Add(creature2);
-            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
 
-            publisher.SubscribeDefenseChange(creature1);
-            publisher.SubscribeDefenseChange(creature2);
-            publisher.ChangeDefenseOfSubscribedCreatures(5);
-            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+            publisher.SubscribeChangeStats(creature1);
+            publisher.SubscribeChangeStats(creature2);
+            publisher.ChangeStats(2, 2);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
 
-            publisher.UnsubscribeDefenseChange(creature2);
-            publisher.ChangeDefenseOfSubscribedCreatures(5);
-            Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
+            publisher.UnsubscribeChangeStats(creature2);
+            publisher.ChangeStats(2, 2);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
             Console.ReadKey();
 
             // Tests
