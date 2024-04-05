@@ -163,10 +163,13 @@ namespace HRTheGathering.Board
          
             // If the player has a Land Card, play it
             // Play a land card, make sure it's turned
-            LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
-            if (landCard != null)
+            while (player.Hand.Any(card => card is LandCard))
             {
-                player.UseCard(landCard);
+                LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
+                if (landCard != null)
+                {
+                    player.UseCard(landCard);
+                }
             }
             
             if (player.Hand.Any(card => card is CreatureCard))
