@@ -62,7 +62,7 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
-            RunTests();
+            //RunTests();
 
             PrepareGame();
             // Add whatever is needed
@@ -102,8 +102,7 @@ namespace HRTheGathering.Board
 
             CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
             CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
-            player1.CardsOnBoard.Add(creature1);
-            player1.CardsOnBoard.Add(creature2);
+
             Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
 
             publisher.SubscribeChangeStats(creature1);
