@@ -8,6 +8,7 @@ namespace HRTheGathering.Board
     {
         private static Board instance = new Board();
         private int currentRound;
+        private Player? winner = null;
         private Player player1;
         private Player player2;
         private PlayerHealthObserver player1LifeObserver;
@@ -65,13 +66,12 @@ namespace HRTheGathering.Board
 
             Console.WriteLine("Done preparing the game - press any key to start the game...");
             Console.ReadKey();
-            while(true)
+            while(winner == null)
             {
                 StartRound();
-                break;
             }
 
-            RunTests();
+            //RunTests();
         }
 
         public void PrepareGame()
@@ -135,7 +135,16 @@ namespace HRTheGathering.Board
         public void StartRound()
         {
             StartTurn(player1);
+
+            // Check if the game has ended after player1's turn
+            if (winner != null)
+                return;
+
             StartTurn(player2);
+
+            // Check if the game has ended after player2's turn
+            if (winner != null)
+                return;
 
             // End the round and go to the next round
             currentRound++;
@@ -145,6 +154,15 @@ namespace HRTheGathering.Board
         {
             // Preparation:
             // Reset temporary effects and reset to original state (example: lands turn back to normal)
+            // Reset all Land Cards on the board
+            foreach (Card card in player.CardsOnBoard)
+            {
+                if (card is LandCard)
+                {
+                    LandCard landCard = (LandCard)card;
+                    landCard.IsTurned = false;
+                }
+            }
 
             // Drawing:
             // Player draws card from deck and add its to their hand
@@ -154,6 +172,7 @@ namespace HRTheGathering.Board
             if (!drawnCard)
             {
                 EndGame(player);
+                return;
             }
 
             // Main:
@@ -171,10 +190,31 @@ namespace HRTheGathering.Board
                     player.UseCard(landCard);
                 }
             }
-            
-            if (player.Hand.Any(card => card is CreatureCard))
+
+            // If the player has a CreatureCard, and the enough LandCards on the board that match the color of the creature to cover the cost, play it
+            if (player.Hand.Any(card => card is CreatureCard creature && player.CardsOnBoard.Count(land => land is LandCard && ((LandCard)land).CardColor == creature.CardColor && !((LandCard)land).IsTurned) >= creature.Cost))
             {
-                // Check if player has enough lands to play creature
+                CreatureCard creatureCard = player.Hand.FirstOrDefault(card => card is CreatureCard) as CreatureCard;
+
+                // Play the card
+                player.UseCard(creatureCard);
+
+                // Turn lands until cost
+                int landsTurned = 0;
+                foreach (var landCard in player.CardsOnBoard)
+                {
+                    if (landCard is LandCard land && land.CardColor == creatureCard.CardColor && !land.IsTurned)
+                    {
+                        land.IsTurned = true;
+                        landsTurned++;
+
+                        if (landsTurned == creatureCard.Cost)
+                        {
+                            // We have turned enough lands, break out of the loop
+                            break;
+                        }
+                    }
+                }
             }
 
 
@@ -194,25 +234,25 @@ namespace HRTheGathering.Board
             // End situation Player1: 4 cards in hand, 3 used lands on the floor, a permanent 
             // creature played in a state of attack, full life.
             // End situation Player2: 6 cards, 1 land on the floor, 5 life.
-            int numberOfLands;
 
-            Console.WriteLine($"{player1.Name}:");
-            Console.WriteLine($"Cards in hand: {player1.Hand.Count}");
-            numberOfLands = player1.CardsOnBoard.Count(card => card is LandCard);
-            Console.WriteLine($"Lands in field: {numberOfLands}");
-            Console.WriteLine($"Lives: {player1.Health}\n");
+            PrintEndSituation(player1);
+            PrintEndSituation(player2);
+        }
 
-            Console.WriteLine($"{player2.Name}:");
-            Console.WriteLine($"Cards in hand: {player2.Hand.Count}");
-            numberOfLands = player2.CardsOnBoard.Count(card => card is LandCard);
+        public void PrintEndSituation(Player player)
+        {
+            Console.WriteLine($"{player.Name}:");
+            Console.WriteLine($"Cards in hand: {player.Hand.Count}");
+            int numberOfLands = player.CardsOnBoard.Count(card => card is LandCard);
             Console.WriteLine($"Lands in field: {numberOfLands}");
-            Console.WriteLine($"Lives: {player2.Health}\n");
+            int numberOfCreatures = player.CardsOnBoard.Count(card => card is CreatureCard);
+            Console.WriteLine($"Creatures in field: {numberOfCreatures}");
+            Console.WriteLine($"Lives: {player.Health}\n");
         }
 
         public void EndGame(Player player)
         {
             // Determine the winning player
-            Player winner;
             if (player == player1)
             {
                 winner = player2;
@@ -222,7 +262,12 @@ namespace HRTheGathering.Board
                 winner = player1;
             }
 
-            Console.WriteLine($"{winner} has won the game!");
+            Console.WriteLine("\n-----------------------------------------------------------");
+            Console.WriteLine($"{winner.Name} has won the game!");
+            Console.WriteLine("press any key to continue...");
+            Console.WriteLine("-----------------------------------------------------------");
+            Console.ReadKey();
+
 
             // End the game by closing the instance and declaring a winner
 

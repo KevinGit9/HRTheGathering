@@ -9,7 +9,7 @@ namespace HRTheGathering.Cards
 {
     public class LandCard : Card
     {
-        public bool IsTurned { get; set; } = false;
+        public bool IsTurned { get; set; } = true;
 
         public void TurnCard()
         {
