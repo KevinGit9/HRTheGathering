@@ -1,4 +1,5 @@
-﻿using HRTheGathering.Players;
+﻿using HRTheGathering.Effects;
+using HRTheGathering.Players;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,14 +87,10 @@ namespace HRTheGathering.Cards
             }
         }
 
-        public void DecreaseDefense(int amount)
+        public void ChangeStats(int attack, int defense)
         {
-            this.Defense -= amount;
-        }
-
-        public void DecreaseAttack(int amount)
-        {
-            this.Attack -= amount;
+            Attack += attack;
+            Defense += defense;
         }
     }
 }

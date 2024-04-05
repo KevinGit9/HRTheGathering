@@ -104,13 +104,13 @@ namespace HRTheGathering.Board
             player1.CardsOnBoard.Add(creature2);
             Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
 
-            publisher.SubscribeDefenseDecrease(creature1);
-            publisher.SubscribeDefenseDecrease(creature2);
-            publisher.DecreaseDefenseOfSubscribedCreatures(5);
+            publisher.SubscribeDefenseChange(creature1);
+            publisher.SubscribeDefenseChange(creature2);
+            publisher.ChangeDefenseOfSubscribedCreatures(5);
             Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
 
-            publisher.UnsubscribeDefenseDecrease(creature2);
-            publisher.DecreaseDefenseOfSubscribedCreatures(5);
+            publisher.UnsubscribeDefenseChange(creature2);
+            publisher.ChangeDefenseOfSubscribedCreatures(5);
             Console.WriteLine($"Creature1: {creature1.Defense}, Creature2: {creature2.Defense}");
             Console.ReadKey();
 

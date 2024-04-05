@@ -1,5 +1,6 @@
 ﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
+using System;
 
 namespace HRTheGathering.Players
 {
@@ -109,6 +110,34 @@ namespace HRTheGathering.Players
             // Add check if its on the board or in the hand
             this.CardsOnBoard.Remove(card);
             this.DiscardPile.Add(card);
+        }
+
+        public void ChangeCardInHandState(int amount, Player player, Card card)
+        {
+            // Remove Cards if amount < 0
+            if (amount < 0)
+            {
+                Random random = new Random();
+                for (int x = -amount; x > 0; x--)
+                {
+                    int randomIndex = random.Next(0, player.Hand.Count());
+                    Card cardToDelete = player.Hand[randomIndex];
+                    // player.DiscardCard(cardToDelete);
+                    player.Hand.Remove(cardToDelete);
+                    player.DiscardPile.Add(cardToDelete);
+                }
+            }
+
+            // Add Cards if amount > 0
+            else if (amount > 0)
+            {
+                for (int y = amount; y > 0; y--)
+                {
+                    player.DrawCard();
+                }
+            }
+
+            return;
         }
     }
 }
