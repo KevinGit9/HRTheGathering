@@ -112,13 +112,13 @@ namespace HRTheGathering.Players
             this.DiscardPile.Add(card);
         }
 
-        public void ChangeCardInHandState(int amount, Player player, Card card)
+        public void ChangeCardsInHandState(int amountCards, Player player)
         {
             // Remove Cards if amount < 0
-            if (amount < 0)
+            if (amountCards < 0)
             {
                 Random random = new Random();
-                for (int x = -amount; x > 0; x--)
+                for (int x = 0; x < -amountCards; x++)
                 {
                     int randomIndex = random.Next(0, player.Hand.Count());
                     Card cardToDelete = player.Hand[randomIndex];
@@ -129,9 +129,9 @@ namespace HRTheGathering.Players
             }
 
             // Add Cards if amount > 0
-            else if (amount > 0)
+            else if (amountCards > 0)
             {
-                for (int y = amount; y > 0; y--)
+                for (int y = 0; y < amountCards; y++)
                 {
                     player.DrawCard();
                 }

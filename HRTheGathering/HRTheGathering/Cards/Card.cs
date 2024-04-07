@@ -1,4 +1,5 @@
 ﻿using HRTheGathering.Effects;
+using HRTheGathering.Players;
 
 namespace HRTheGathering.Cards
 {
@@ -29,6 +30,5 @@ namespace HRTheGathering.Cards
             Green
             // Implement colorless
         }
-
     }
 }

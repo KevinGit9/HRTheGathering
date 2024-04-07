@@ -1,4 +1,5 @@
 ﻿using HRTheGathering.Cards;
+using HRTheGathering.Effects;
 using HRTheGathering.Observers;
 using HRTheGathering.Players;
 using HRTheGathering.Publishers;
@@ -23,8 +24,8 @@ namespace HRTheGathering.Board
         public Board()
         {
             currentRound = 0;
-            player1 = new Player { Name = "Player 1"};
-            player2 = new Player { Name = "Player 2" };
+            player1 = new Player { Name = "Player 1", Id = 1 };
+            player2 = new Player { Name = "Player 2", Id = 2 };
 
             player1LifeObserver = new PlayerHealthObserver();
             player2LifeObserver = new PlayerHealthObserver();
@@ -62,7 +63,7 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
-            //RunTests();
+            RunTests();
 
             PrepareGame();
             // Add whatever is needed
@@ -97,22 +98,60 @@ namespace HRTheGathering.Board
 
         public void RunTests()
         {
-            // Pub Sub Test
+            // Creature Stats Change Test
             Publisher publisher = new Publisher();
 
             CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
             CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
+            CreatureCard creature3 = new CreatureCard { Name = "Creature 3", Attack = 4, Defense = 3 };
+            CreatureCard creature4 = new CreatureCard { Name = "Creature 4", Attack = 7, Defense = 8 };
 
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
 
-            publisher.SubscribeChangeStats(creature1);
-            publisher.SubscribeChangeStats(creature2);
-            publisher.ChangeStats(2, 2);
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
+            publisher.SubscribeChangeStats(creature1, player1);
+            publisher.SubscribeChangeStats(creature2, player1);
+            publisher.SubscribeChangeStats(creature3, player2);
+            publisher.SubscribeChangeStats(creature4, player2);
 
-            publisher.UnsubscribeChangeStats(creature2);
-            publisher.ChangeStats(2, 2);
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense})");
+            publisher.ChangeStatsCreatures(2, 2, player1);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+
+            publisher.UnsubscribeChangeStats(creature2, player1);
+            publisher.ChangeStatsCreatures(2, 2, player1);
+            publisher.ChangeStatsCreatures(2, 2, player2);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");  
+            
+            publisher.UnsubscribeChangeStats(creature3, player2);
+            publisher.ChangeStatsCreatures(2, 2, player2);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+            Console.WriteLine("-----");
+
+            ChangeStats changeStats = new ChangeStats(2, 2, player1, publisher);
+            SpellCard spellCard2 = new SpellCard { CardEffect = changeStats };
+            spellCard2.CardEffect.ApplyEffect();
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+            
+            Console.WriteLine("-----");
+            ChangeStats changeStats2 = new ChangeStats(2, 2, player2, publisher);
+            SpellCard spellCard = new SpellCard { CardEffect = changeStats2 };
+            spellCard.CardEffect.ApplyEffect();
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+            Console.ReadKey();
+
+            // Change CardsInHand Test
+            player1.Hand.Add(creature1);
+            player1.Hand.Add(creature2);
+            player1.Hand.Add(creature3);
+            player1.Hand.Add(creature4);
+            Console.WriteLine($"Cards in hand: { player1.Hand.Count()}");
+
+            ChangeCardsInHand changeCardsInHand = new ChangeCardsInHand(-2, player1, publisher);
+            SpellCard spellcardCardsInHand = new SpellCard { CardEffect = changeCardsInHand};
+
+            publisher.SubscribeCardsInHand(player1);
+
+            spellcardCardsInHand.CardEffect.ApplyEffect();
+            Console.WriteLine($"Cards in hand: {player1.Hand.Count()}");
             Console.ReadKey();
 
             // Tests

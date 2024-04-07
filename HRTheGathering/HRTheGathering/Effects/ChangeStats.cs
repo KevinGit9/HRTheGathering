@@ -1,4 +1,6 @@
 ﻿using HRTheGathering.Cards;
+using HRTheGathering.Players;
+using HRTheGathering.Publishers;
 
 namespace HRTheGathering.Effects
 {
@@ -6,21 +8,21 @@ namespace HRTheGathering.Effects
     {
         private int attackChange;
         private int defenseChange;
+        private Player playerTarget;
+        private Publisher publisher;
 
-        public ChangeStats(int attack, int defense)
+        public ChangeStats(int attack, int defense, Player player, Publisher publisherTarget)
         {
             attackChange = attack;
             defenseChange = defense;
+            playerTarget = player;
+            publisher = publisherTarget;
         }
 
-        public void ApplyEffect(object target)
+        public void ApplyEffect()
         {
-            if (target is not CreatureCard) return;
 
-            CreatureCard creature = (CreatureCard)target;
-
-            creature.Attack += attackChange;
-            creature.Defense += defenseChange;
+            publisher.ChangeStatsCreatures(attackChange, defenseChange, playerTarget);
         }
     }
 }
