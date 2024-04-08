@@ -29,7 +29,7 @@ namespace HRTheGathering.Cards
         {
             foreach (Card card in playerCards)
             {
-                if (card.CardType == Type.Creature)
+                if (card is CreatureCard)
                 {
                     CreatureCard creatureCard = (CreatureCard) card;
                     creatureCard.IsAttacker = false;
@@ -38,53 +38,89 @@ namespace HRTheGathering.Cards
             }
         }
 
-        public CreatureCard? GetAttackerCreatureCard(List<Card> playerCards)
-        {
-            foreach (Card card in playerCards)
-            {
-                if (card.CardType == Type.Creature)
-                {
-                    CreatureCard creatureCard = (CreatureCard) card;
-                    if (creatureCard.IsAttacker == true)
-                    {
-                        return creatureCard;
-                    }
-                }
-            }
-            return null;
-        }
-
-        public CreatureCard? GetDefenderCreatureCard(List<Card> playerCards)
-        {
-            foreach (Card card in playerCards)
-            {
-                if (card.CardType == Type.Creature)
-                {
-                    CreatureCard creatureCard = (CreatureCard)card;
-                    if (creatureCard.IsDefender == true)
-                    {
-                        return creatureCard;
-                    }
-                }
-            }
-            return null;
-        }
-
         public void AttackEnemy(Player attackingPlayer, Player defendingPlayer)
         {
             // TODO: Player can choose to assign defender
-            CreatureCard attacker = GetAttackerCreatureCard(attackingPlayer.CardsOnBoard);
-            CreatureCard defender = GetDefenderCreatureCard(defendingPlayer.CardsOnBoard);
 
-            if (attacker != null && defender == null)
+            CreatureCard? attackingCreature = null;
+            CreatureCard? defendingCreature = null;
+
+            foreach (Card card in attackingPlayer.CardsOnBoard)
             {
-                defendingPlayer.Health -= attacker.Attack;
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (attackingCreature == null)
+                    {
+                        attackingCreature = creature;
+                    }
+                    else if (creature.Attack > attackingCreature.Attack)
+                    {
+                        attackingCreature = creature;
+                    }
+                }
             }
-            else if (attacker != null && defender != null)
+
+            if (attackingCreature != null)
             {
-                defender.Defense -= attacker.Attack;
-                attacker.Defense -= defender.Attack;
+                SetAttacker(attackingCreature);
             }
+
+            foreach (Card card in defendingPlayer.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (defendingCreature == null)
+                    {
+                        attackingCreature = creature;
+                    }
+                    else if (creature.Defense > defendingCreature.Defense)
+                    {
+                        defendingCreature = creature;
+                    }
+
+                }
+            }
+
+            if (defendingCreature != null)
+            {
+                SetDefender(defendingCreature);
+            }
+
+            if (attackingCreature != null)
+            {
+                if (!defendingPlayer.HasBlockAttackInstant())
+                {
+                    if (defendingCreature == null)
+                    {
+                        defendingPlayer.Health -= attackingCreature.Attack;
+                    }
+                    else if (defendingCreature != null)
+                    {
+                        defendingCreature.Defense -= attackingCreature.Attack;
+                        attackingCreature.Defense -= defendingCreature.Attack;
+                    }
+                }
+                else if (defendingPlayer.HasBlockAttackInstant())
+                {
+                    if (attackingPlayer.HasBlockInstantInstant())
+                    {
+                        if (defendingCreature == null)
+                        {
+                            defendingPlayer.Health -= attackingCreature.Attack;
+                        }
+                        else if (defendingCreature != null)
+                        {
+                            defendingCreature.Defense -= attackingCreature.Attack;
+                            attackingCreature.Defense -= defendingCreature.Attack;
+                        }
+                    }
+                }
+            }
+
+            ClearAllAttackerDefender(attackingPlayer.Hand);
+            ClearAllAttackerDefender(defendingPlayer.Hand);
         }
 
         public void ChangeStats(int attack, int defense)

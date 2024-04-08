@@ -1,5 +1,6 @@
 ﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
+using HRTheGathering.Publishers;
 using System;
 
 namespace HRTheGathering.Players
@@ -94,7 +95,7 @@ namespace HRTheGathering.Players
             return true;
         }
 
-        public void UseCard(Card card)
+        public void UseCard(Card card, Publisher publisher)
         {
             List<Card> newCardsOnBoard = new List<Card>(CardsOnBoard);
             newCardsOnBoard.Add(card);
@@ -103,16 +104,29 @@ namespace HRTheGathering.Players
             List<Card> newHand = new List<Card>(Hand);
             newHand.Remove(card);
             Hand = newHand; 
+
+            if (card is CreatureCard)
+            {
+                CreatureCard creature = (CreatureCard)card;
+                publisher.SubscribeChangeStats(creature, this);
+            }
+
+            if (card.CardEffect != null)
+            {
+                card.CardEffect.ApplyEffect();
+            }
         }
 
-        public void DiscardCard(Card card)
+        public void DiscardCard(Card card, Publisher publisher)
         {
             // Add check if its on the board or in the hand
+            this.Hand.Remove(card);
             this.CardsOnBoard.Remove(card);
             this.DiscardPile.Add(card);
+            publisher.UnsubscribeRemovedCreatureCard(card);
         }
 
-        public void ChangeCardsInHandState(int amountCards, Player player)
+        public void ChangeCardsInHandState(int amountCards, Player player, Publisher publisher)
         {
             // Remove Cards if amount < 0
             if (amountCards < 0)
@@ -122,9 +136,7 @@ namespace HRTheGathering.Players
                 {
                     int randomIndex = random.Next(0, player.Hand.Count());
                     Card cardToDelete = player.Hand[randomIndex];
-                    // player.DiscardCard(cardToDelete);
-                    player.Hand.Remove(cardToDelete);
-                    player.DiscardPile.Add(cardToDelete);
+                    player.DiscardCard(cardToDelete, publisher);
                 }
             }
 
@@ -138,6 +150,30 @@ namespace HRTheGathering.Players
             }
 
             return;
+        }
+
+        public bool HasBlockAttackInstant()
+        {
+            foreach (Card card in Hand)
+            {
+                if (card is SpellCard && card.Name == "BlockAttackInstant")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool HasBlockInstantInstant()
+        {
+            foreach (Card card in Hand)
+            {
+                if (card is SpellCard && card.Name == "BlockInstantInstant")
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

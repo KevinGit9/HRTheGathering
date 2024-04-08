@@ -23,7 +23,7 @@ namespace HRTheGathering.Effects
 
         public void ApplyEffect()
         {
-            publisher.ChangeStateCardsInHand(amountCards, playerTarget);
+            publisher.ChangeStateCardsInHand(amountCards, playerTarget, publisher);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HRTheGathering.Board;
+using HRTheGathering.Publishers;
 
 class Program
 {

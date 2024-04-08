@@ -9,6 +9,7 @@ namespace HRTheGathering.Board
     class Board
     {
         private static Board instance = new Board();
+        private Publisher publisher = Publisher.Instance;
         private int currentRound;
         private Player? winner = null;
         private Player player1;
@@ -74,7 +75,6 @@ namespace HRTheGathering.Board
             {
                 StartRound();
             }
-
         }
 
         public void PrepareGame()
@@ -150,7 +150,7 @@ namespace HRTheGathering.Board
 
             publisher.SubscribeCardsInHand(player1);
 
-            spellcardCardsInHand.CardEffect.ApplyEffect();
+            player1.UseCard(spellcardCardsInHand, publisher);
             Console.WriteLine($"Cards in hand: {player1.Hand.Count()}");
             Console.ReadKey();
 
@@ -228,7 +228,7 @@ namespace HRTheGathering.Board
                 LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
                 if (landCard != null)
                 {
-                    player.UseCard(landCard);
+                    player.UseCard(landCard, publisher);
                 }
             }
 
