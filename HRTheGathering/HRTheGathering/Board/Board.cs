@@ -154,7 +154,7 @@ namespace HRTheGathering.Board
             Console.WriteLine($"Cards in hand: {player1.Hand.Count()}");
             Console.ReadKey();
 
-            // Tests
+            // Health Observer Test
             Console.WriteLine(player1.Health);
             Console.WriteLine(player2.Health);
             Console.WriteLine("Press enter to attack player 1 with 5 damage...");
@@ -164,6 +164,7 @@ namespace HRTheGathering.Board
             int damageAmount = 5; // Let's say the damage amount is 10
             player1.Health -= damageAmount;
 
+            // Hand Observer Test
             Console.WriteLine("Press enter to draw a card for player 1...");
             Console.ReadKey();
 
@@ -234,16 +235,18 @@ namespace HRTheGathering.Board
             // If the player has a CreatureCard, and the enough LandCards on the board that match the color of the creature to cover the cost, play it
             if (player.Hand.Any(card => card is CreatureCard creature && player.CardsOnBoard.Count(land => land is LandCard && ((LandCard)land).CardColor == creature.CardColor && !((LandCard)land).IsTurned) >= creature.Cost))
             {
-                CreatureCard creatureCard = player.Hand.FirstOrDefault(card => card is CreatureCard) as CreatureCard;
+                CreatureCard? creatureCard = player.Hand.FirstOrDefault(card => card is CreatureCard) as CreatureCard;
 
-                // Play the card
-                player.UseCard(creatureCard);
+                if (creatureCard != null)
+                {
+                    player.UseCard(creatureCard);
+                }
 
                 // Turn lands until cost
                 int landsTurned = 0;
                 foreach (var landCard in player.CardsOnBoard)
                 {
-                    if (landCard is LandCard land && land.CardColor == creatureCard.CardColor && !land.IsTurned)
+                    if (creatureCard != null && landCard is LandCard land && land.CardColor == creatureCard.CardColor && !land.IsTurned)
                     {
                         land.IsTurned = true;
                         landsTurned++;
