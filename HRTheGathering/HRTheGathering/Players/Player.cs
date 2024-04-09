@@ -1,7 +1,6 @@
 ﻿using HRTheGathering.Cards;
 using HRTheGathering.Observers;
 using HRTheGathering.Publishers;
-using System;
 
 namespace HRTheGathering.Players
 {
@@ -117,13 +116,54 @@ namespace HRTheGathering.Players
             }
         }
 
+        public void UseCardWithCost(Card card, Publisher publisher)
+        {
+            // If not enough Lands to play the card, return out
+            if (CardsOnBoard.Count(land => land is LandCard && ((LandCard)land).CardColor == card.CardColor && !((LandCard)land).IsTurned) < card.Cost)
+            {
+                return;
+            }
+            
+            // Turn lands until cost
+            int landsTurned = 0;
+            foreach (var landCard in CardsOnBoard)
+            {
+                if (card != null && landCard is LandCard land && land.CardColor == card.CardColor && !land.IsTurned)
+                {
+                    land.IsTurned = true;
+                    landsTurned++;
+
+                    if (landsTurned == card.Cost)
+                    {
+                        // We have turned enough lands, break out of the loop
+                        break;
+                    }
+                }
+            }
+
+            UseCard(card, publisher);
+        }
+
         public void DiscardCard(Card card, Publisher publisher)
         {
             // Add check if its on the board or in the hand
-            this.Hand.Remove(card);
-            this.CardsOnBoard.Remove(card);
+            if (Hand.Contains(card))
+            {
+                List<Card> newHand = new List<Card>(Hand);
+                newHand.Remove(card);
+                Hand = newHand;
+            }
+            else
+            {
+                CardsOnBoard.Remove(card);
+            }
+
             this.DiscardPile.Add(card);
-            publisher.UnsubscribeRemovedCreatureCard(card);
+
+            if (card is CreatureCard)
+            {
+                publisher.UnsubscribeRemovedCreatureCard(card);
+            }
         }
 
         public void ChangeCardsInHandState(int amountCards, Player player, Publisher publisher)
