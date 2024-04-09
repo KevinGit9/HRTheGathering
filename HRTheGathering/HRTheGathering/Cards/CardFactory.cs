@@ -28,10 +28,9 @@ namespace HRTheGathering.Cards
             return new SpellCard { Name = name, Cost = cost, CardColor = color, CardEffect = effect };
         }
 
-        public InstantCard CreateInstantCard()
+        public InstantCard CreateInstantCard(string name, int cost, Color color, IEffect effect)
         {
-            return new InstantCard { };
-
+            return new InstantCard { Name = name, Cost = cost, CardColor = color, CardEffect = effect };
         }
 
         public List<Card> CreateDeck(Color color, Player player, Publisher publisher)
@@ -77,7 +76,9 @@ namespace HRTheGathering.Cards
                     //deck.Add(CreateSpellCard("Radiant Blessing", Card.Color.White, 3, "Gives all your creatures +2/+2 until the end of the turn."));
                     //deck.Add(CreateSpellCard("Celestial Purge", Card.Color.White, 5, "Discards target creature."));
 
-                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Gives all your creatures +2/+2");
+                    NullifySpell nullifySpell = new NullifySpell("Nullify the opponents spell.");
+                    deck.Add(CreateInstantCard("Divine Reprieve", 1, Color.White, nullifySpell));
+                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Gives all your creatures +2/+2.");
                     deck.Add(CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2));
                 }
             }
