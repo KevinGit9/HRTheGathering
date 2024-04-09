@@ -244,7 +244,7 @@ namespace HRTheGathering.Board
                 player.UseCardWithCost(creatureCard, publisher);
             }
 
-            // If the player has a CreatureCard, try to play it
+            // If the player has a SpellCard, try to play it
             SpellCard? spellCard = player.Hand.FirstOrDefault(card => card is SpellCard) as SpellCard;
             if (spellCard != null)
             {
