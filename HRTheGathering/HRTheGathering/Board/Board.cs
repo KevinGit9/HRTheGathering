@@ -342,6 +342,7 @@ namespace HRTheGathering.Board
         public void Attack(Player target)
         {
             Player? attacker;
+            bool nullifySpell = false;
 
             if (target == player1)
             {
@@ -352,10 +353,30 @@ namespace HRTheGathering.Board
                 attacker = player1;
             }
 
-            //if (attacker.CardsOnBoard.Contains(SpellCard))
-            //{
+            while (spellStack.Count > 0)
+            {
+                Card currentSpell = spellStack.Pop();
 
-            //}
+                if (currentSpell.CardEffect != null)
+                {
+                    // If spell is nullified, go to next spell
+                    if (nullifySpell)
+                    {
+                        nullifySpell = false;
+                        continue;
+                    }
+
+                    // If spell effect nullies next spell, set nullifySpell to true and go to the next spell
+                    if (currentSpell.CardEffect is NullifySpell)
+                    {
+                        nullifySpell = true;
+                        continue;
+                    }
+
+                    // Apply effect of the spell
+                    currentSpell.CardEffect.ApplyEffect();
+                }
+            }
         }
     }
 }
