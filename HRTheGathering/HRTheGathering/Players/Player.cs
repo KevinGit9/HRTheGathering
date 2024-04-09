@@ -94,7 +94,7 @@ namespace HRTheGathering.Players
             return true;
         }
 
-        public void UseCard(Card card, Publisher publisher)
+        public void UseCard(Card card, Publisher publisher, Stack<Card>? stack = null)
         {
             List<Card> newCardsOnBoard = new List<Card>(CardsOnBoard);
             newCardsOnBoard.Add(card);
@@ -108,15 +108,24 @@ namespace HRTheGathering.Players
             {
                 CreatureCard creature = (CreatureCard)card;
                 publisher.SubscribeChangeStats(creature, this);
+
+                if (creature.CardEffect != null)
+                {
+                    creature.CardEffect.ApplyEffect();
+                }
             }
 
-            if (card.CardEffect != null)
+            if (card is SpellCard or InstantCard)
             {
-                card.CardEffect.ApplyEffect();
+                Console.WriteLine("hello");
+                if (stack != null)
+                {
+                    stack.Push(card);
+                }
             }
         }
 
-        public void UseCardWithCost(Card card, Publisher publisher)
+        public void UseCardWithCost(Card card, Publisher publisher, Stack<Card>? stack = null)
         {
             // If not enough Lands to play the card, return out
             if (CardsOnBoard.Count(land => land is LandCard && ((LandCard)land).CardColor == card.CardColor && !((LandCard)land).IsTurned) < card.Cost)
@@ -141,7 +150,14 @@ namespace HRTheGathering.Players
                 }
             }
 
-            UseCard(card, publisher);
+            if (card is SpellCard or InstantCard)
+            {
+                UseCard(card, publisher, stack);
+            }
+            else
+            {
+                UseCard(card, publisher);
+            }
         }
 
         public void DiscardCard(Card card, Publisher publisher)
@@ -158,7 +174,7 @@ namespace HRTheGathering.Players
                 CardsOnBoard.Remove(card);
             }
 
-            this.DiscardPile.Add(card);
+            DiscardPile.Add(card);
 
             if (card is CreatureCard)
             {

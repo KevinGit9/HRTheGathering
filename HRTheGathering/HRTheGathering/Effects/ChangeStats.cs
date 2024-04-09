@@ -11,12 +11,15 @@ namespace HRTheGathering.Effects
         private Player playerTarget;
         private Publisher publisher;
 
-        public ChangeStats(int attack, int defense, Player player, Publisher publisherTarget)
+        public string Description { get; }
+
+        public ChangeStats(int attack, int defense, Player player, Publisher publisherTarget, string description)
         {
             attackChange = attack;
             defenseChange = defense;
             playerTarget = player;
             publisher = publisherTarget;
+            Description = description;
         }
 
         public void ApplyEffect()

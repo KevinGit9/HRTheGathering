@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using HRTheGathering.Cards;
 using HRTheGathering.Effects;
 using HRTheGathering.Observers;
@@ -11,6 +12,7 @@ namespace HRTheGathering.Board
     {
         private static Board instance = new Board();
         private Publisher publisher = Publisher.Instance;
+        Stack<Card> spellStack = new Stack<Card>();
         private int currentRound;
         private Player? winner = null;
         private Player player1;
@@ -26,8 +28,8 @@ namespace HRTheGathering.Board
         public Board()
         {
             currentRound = 0;
-            player1 = new Player { Name = "Player 1", Id = 1 };
-            player2 = new Player { Name = "Player 2", Id = 2 };
+            player1 = new Player { Id = 1, Name = "Player 1" };
+            player2 = new Player { Id = 2, Name = "Player 2" };
 
             player1LifeObserver = new PlayerHealthObserver();
             player2LifeObserver = new PlayerHealthObserver();
@@ -81,8 +83,8 @@ namespace HRTheGathering.Board
         public void PrepareGame()
         {
             // Create decks for both players
-            player1.Deck = cardFactory.CreateDeck(Card.Color.White);
-            player2.Deck = cardFactory.CreateDeck(Card.Color.Red);
+            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, publisher);
+            player2.Deck = cardFactory.CreateDeck(Card.Color.Red, player2, publisher);
 
             // Shuffle decks of each player
             player1.ShuffleDeck();
@@ -119,7 +121,7 @@ namespace HRTheGathering.Board
             //publisher.ChangeStatsCreatures(2, 2, player1);
             //publisher.ChangeStatsCreatures(2, 2, player2);
             //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");  
-            
+
             //publisher.UnsubscribeChangeStats(creature3, player2);
             //publisher.ChangeStatsCreatures(2, 2, player2);
             //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
@@ -129,7 +131,7 @@ namespace HRTheGathering.Board
             //SpellCard spellCard2 = new SpellCard { CardEffect = changeStats };
             //spellCard2.CardEffect.ApplyEffect();
             //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-            
+
             //Console.WriteLine("-----");
             //ChangeStats changeStats2 = new ChangeStats(2, 2, player2, publisher);
             //SpellCard spellCard = new SpellCard { CardEffect = changeStats2 };
@@ -167,7 +169,7 @@ namespace HRTheGathering.Board
             Console.WriteLine("Press enter to draw a card for player 1...");
             Console.ReadKey();
 
-            player1.Deck = cardFactory.CreateDeck(Card.Color.White);
+            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, publisher);
             player1.DrawCard();
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
@@ -201,14 +203,7 @@ namespace HRTheGathering.Board
             // Preparation:
             // Reset temporary effects and reset to original state (example: lands turn back to normal)
             // Reset all Land Cards on the board
-            foreach (Card card in player.CardsOnBoard)
-            {
-                if (card is LandCard)
-                {
-                    LandCard landCard = (LandCard)card;
-                    landCard.IsTurned = false;
-                }
-            }
+            ClearAllTurnedLandCards(player);
 
             // Drawing:
             // Player draws card from deck and add its to their hand
@@ -248,11 +243,11 @@ namespace HRTheGathering.Board
             SpellCard? spellCard = player.Hand.FirstOrDefault(card => card is SpellCard) as SpellCard;
             if (spellCard != null)
             {
-                player.UseCardWithCost(spellCard, publisher);
+                player.UseCardWithCost(spellCard, publisher, spellStack);
             }
 
             // TODO: Add attack
-
+            
 
             // Ending:
             // Player must discard cards from their hand until the cards in hand dont exceed MaxCardsInHand (7)
@@ -332,11 +327,11 @@ namespace HRTheGathering.Board
 
         }
 
-        public void ClearAllTurnedLandCards(List<Card> playerCards)
+        public void ClearAllTurnedLandCards(Player player)
         {
-            foreach (Card card in playerCards)
+            foreach (Card card in player.CardsOnBoard)
             {
-                if (card.CardType == Card.Type.Land)
+                if (card is LandCard)
                 {
                     LandCard landCard = (LandCard)card;
                     landCard.IsTurned = false;
@@ -344,22 +339,23 @@ namespace HRTheGathering.Board
             }
         }
 
-        public List<LandCard> GetAllTurnedLandCards(List<Card> playerCards)
+        public void Attack(Player target)
         {
-            List<LandCard> TurnedLandCards = new List<LandCard>();
+            Player? attacker;
 
-            foreach (Card card in playerCards)
+            if (target == player1)
             {
-                if (card.CardType == Card.Type.Land)
-                {
-                    LandCard landCard = (LandCard)card;
-                    TurnedLandCards.Add(landCard);
-                }
+                attacker = player2;
             }
-            return TurnedLandCards;
-        }
+            else
+            {
+                attacker = player1;
+            }
 
+            //if (attacker.CardsOnBoard.Contains(SpellCard))
+            //{
+
+            //}
+        }
     }
 }
-
-// TODO: Add pub sub channel for player1 and another one for player2

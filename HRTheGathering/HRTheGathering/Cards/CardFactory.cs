@@ -1,6 +1,10 @@
-﻿using System;
+﻿using HRTheGathering.Effects;
+using HRTheGathering.Players;
+using HRTheGathering.Publishers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using static HRTheGathering.Cards.Card;
@@ -16,24 +20,12 @@ namespace HRTheGathering.Cards
 
         public CreatureCard CreateCreatureCard(string name, int cost, Color color, int attack, int defense)
         {
-            //if (name == null)
-            //{
-                //Random random = new Random();
-                //int length = random.Next(5, 11);
-                //const string chars = "abcdefghijklmnopqrstuvwxyz";
-                //string randomString = new string(Enumerable.Repeat(chars, length)
-                //    .Select(s => s[random.Next(s.Length)]).ToArray());
-
-                //string name = char.ToUpper(randomString[0]) + randomString.Substring(1);
-            //}
-
             return new CreatureCard { Name = name, Cost = cost, CardColor = color, Attack = attack, Defense = defense};
         }
 
-        public SpellCard CreateSpellCard()
+        public SpellCard CreateSpellCard(string name, int cost, Color color, IEffect effect)
         {
-            return new SpellCard { };
-
+            return new SpellCard { Name = name, Cost = cost, CardColor = color, CardEffect = effect };
         }
 
         public InstantCard CreateInstantCard()
@@ -42,7 +34,7 @@ namespace HRTheGathering.Cards
 
         }
 
-        public List<Card> CreateDeck(Color color)
+        public List<Card> CreateDeck(Color color, Player player, Publisher publisher)
         {
             List<Card> deck = new List<Card>();
             int maxCopiesPerCard = 3;
@@ -69,21 +61,24 @@ namespace HRTheGathering.Cards
                 for (int i = 0; i < maxCopiesPerCard; i++)
                 {
                     // Add white lands
-                    deck.Add(CreateLandCard("Sunlit Meadows", Card.Color.White));
-                    deck.Add(CreateLandCard("Radiant Glade", Card.Color.White));
-                    deck.Add(CreateLandCard("Luminous Plains", Card.Color.White));
-                    deck.Add(CreateLandCard("Celestial Grove", Card.Color.White));
+                    deck.Add(CreateLandCard("Sunlit Meadows", Color.White));
+                    deck.Add(CreateLandCard("Radiant Glade", Color.White));
+                    deck.Add(CreateLandCard("Luminous Plains", Color.White));
+                    deck.Add(CreateLandCard("Celestial Grove", Color.White));
 
 
                     // Add white creatures
-                    deck.Add(CreateCreatureCard("Dawn Paladin", 1, Card.Color.White, 1, 2));
-                    deck.Add(CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 3));
-                    deck.Add(CreateCreatureCard("Aegis Angel", 3, Card.Color.White, 4, 4));
+                    deck.Add(CreateCreatureCard("Dawn Paladin", 1, Color.White, 1, 2));
+                    deck.Add(CreateCreatureCard("Griffon", 2, Color.White, 2, 3));
+                    deck.Add(CreateCreatureCard("Aegis Angel", 3, Color.White, 4, 4));
 
                     // Add white spells
                     //deck.Add(CreateInstantCard("Divine Reprieve", Card.Color.White, 1, "Nullify the opponent's attack."));
                     //deck.Add(CreateSpellCard("Radiant Blessing", Card.Color.White, 3, "Gives all your creatures +2/+2 until the end of the turn."));
                     //deck.Add(CreateSpellCard("Celestial Purge", Card.Color.White, 5, "Discards target creature."));
+
+                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Gives all your creatures +2/+2");
+                    deck.Add(CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2));
                 }
             }
             else if (color == Color.Red)
@@ -91,16 +86,16 @@ namespace HRTheGathering.Cards
                 for (int i = 0; i < maxCopiesPerCard; i++)
                 {
                     // Add red lands
-                    deck.Add(CreateLandCard("Molten Peak", Card.Color.Red));
-                    deck.Add(CreateLandCard("Ember Highlands", Card.Color.Red));
-                    deck.Add(CreateLandCard("Volcanic Crater", Card.Color.Red));
-                    deck.Add(CreateLandCard("Blaze Ridge", Card.Color.Red));
+                    deck.Add(CreateLandCard("Molten Peak", Color.Red));
+                    deck.Add(CreateLandCard("Ember Highlands", Color.Red));
+                    deck.Add(CreateLandCard("Volcanic Crater", Color.Red));
+                    deck.Add(CreateLandCard("Blaze Ridge", Color.Red));
 
 
                     // Add red creatures
-                    deck.Add(CreateCreatureCard("Magma Hound", 1, Card.Color.Red, 2, 1));
-                    deck.Add(CreateCreatureCard("Inferno Adept", 2, Card.Color.Red, 2, 2));
-                    deck.Add(CreateCreatureCard("Ancient Dragon", 4, Card.Color.Red, 6, 6));
+                    deck.Add(CreateCreatureCard("Magma Hound", 1, Color.Red, 2, 1));
+                    deck.Add(CreateCreatureCard("Inferno Adept", 2, Color.Red, 2, 2));
+                    deck.Add(CreateCreatureCard("Ancient Dragon", 4, Color.Red, 6, 6));
 
                     // Add red spells
                     //deck.Add(CreateSpellCard("Volcanic Fury", Card.Color.Red, 1, "Target creature gets +3/0 until the end of the turn."));

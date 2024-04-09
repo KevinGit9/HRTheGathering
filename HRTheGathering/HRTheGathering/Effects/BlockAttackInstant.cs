@@ -10,10 +10,13 @@ namespace HRTheGathering.Effects
     public class BlockAttackInstant : IEffect
     {
         private Player playerTarget;
+        public string Description { get; }
 
-        public BlockAttackInstant(Player player) 
+
+        public BlockAttackInstant(Player player, string description) 
         {
             playerTarget = player;
+            Description = description;
         }
 
         public void ApplyEffect()
