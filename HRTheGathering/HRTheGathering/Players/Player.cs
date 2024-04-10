@@ -117,7 +117,6 @@ namespace HRTheGathering.Players
 
             if (card is SpellCard or InstantCard)
             {
-                Console.WriteLine("hello");
                 if (stack != null)
                 {
                     stack.Push(card);

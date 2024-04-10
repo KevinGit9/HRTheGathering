@@ -27,7 +27,7 @@ namespace HRTheGathering.Board
 
         public Board()
         {
-            currentRound = 0;
+            currentRound = 1;
             player1 = new Player { Id = 1, Name = "Player 1" };
             player2 = new Player { Id = 2, Name = "Player 2" };
 
@@ -67,7 +67,7 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
-            RunTests();
+            //RunTests();
 
             PrepareGame();
             // Add whatever is needed
@@ -83,8 +83,8 @@ namespace HRTheGathering.Board
         public void PrepareGame()
         {
             // Create decks for both players
-            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, publisher);
-            player2.Deck = cardFactory.CreateDeck(Card.Color.Red, player2, publisher);
+            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, player2, publisher);
+            player2.Deck = cardFactory.CreateDeck(Card.Color.Red, player2, player1, publisher);
 
             // Shuffle decks of each player
             player1.ShuffleDeck();
@@ -169,7 +169,7 @@ namespace HRTheGathering.Board
             Console.WriteLine("Press enter to draw a card for player 1...");
             Console.ReadKey();
 
-            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, publisher);
+            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, player2, publisher);
             player1.DrawCard();
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
@@ -200,10 +200,15 @@ namespace HRTheGathering.Board
 
         public void StartTurn(Player player)
         {
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nCurrent Turn: {currentRound} - Player: {player.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+
             // Preparation:
             // Reset temporary effects and reset to original state (example: lands turn back to normal)
             // Reset all Land Cards on the board
             ClearAllTurnedLandCards(player);
+            UnturnAllCreatureCards(player);
 
             // Drawing:
             // Player draws card from deck and add its to their hand
@@ -246,8 +251,8 @@ namespace HRTheGathering.Board
                 player.UseCardWithCost(spellCard, publisher, spellStack);
             }
 
-            // TODO: Add attack
-            
+            // Attack
+            Attack(player);
 
             // Ending:
             // Player must discard cards from their hand until the cards in hand dont exceed MaxCardsInHand (7)
@@ -290,10 +295,10 @@ namespace HRTheGathering.Board
             Console.WriteLine($"Lives: {player.Health}\n");
         }
 
-        public void EndGame(Player player)
+        public void EndGame(Player loser)
         {
             // Determine the winning player
-            if (player == player1)
+            if (loser == player1)
             {
                 winner = player2;
             }
@@ -339,18 +344,66 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void Attack(Player target)
+        public void Attack(Player attacker)
         {
-            Player? attacker;
+            Player? defender;
             bool nullifySpell = false;
+            CreatureCard? attackingCreature = null;
+            CreatureCard? defendingCreature = null;
 
-            if (target == player1)
+            if (attacker == player1)
             {
-                attacker = player2;
+                defender = player2;
             }
             else
             {
-                attacker = player1;
+                defender = player1;
+            }
+
+            // Get attacking creature with highest attack
+            foreach (Card card in attacker.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned == false)
+                    {
+                        if (attackingCreature == null)
+                        {
+                            attackingCreature = creature;
+                        }
+                        else if (creature.Attack > attackingCreature.Attack)
+                        {
+                            attackingCreature = creature;
+                        }
+                    }
+                }
+            }
+
+            // If no attacking creature, return out
+            if (attackingCreature == null)
+            {
+                return;
+            }
+
+            // Get defending creature with highest defense
+            foreach (Card card in defender.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned == false)
+                    {
+                        if (defendingCreature == null)
+                        {
+                            defendingCreature = creature;
+                        }
+                        else if (creature.Defense > defendingCreature.Defense)
+                        {
+                            defendingCreature = creature;
+                        }
+                    }
+                }
             }
 
             while (spellStack.Count > 0)
@@ -375,6 +428,54 @@ namespace HRTheGathering.Board
 
                     // Apply effect of the spell
                     currentSpell.CardEffect.ApplyEffect();
+                }
+            }
+            // TODO: Spells to increase/decrease stats work but only get displayed during the next turn
+
+            // Attack player if there is an attacking creature but no defending creature
+            if (attackingCreature != null && defendingCreature == null)
+            {
+                Console.WriteLine($"[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) Attacked {defender.Name} with {attackingCreature.Attack}");
+                defender.Health -= attackingCreature.Attack;
+                attackingCreature.IsTurned = true;
+                
+                // If defender health is lower or equal to 0, defending player loses
+                if (defender.Health <= 0)
+                {
+                    EndGame(defender);
+                }
+            }
+            // Attack defending creature if there is an attacking creature and defending creature
+            else if (attackingCreature != null && defendingCreature != null)
+            {
+                defendingCreature.Defense -= attackingCreature.Attack;
+                attackingCreature.Defense -= defendingCreature.Attack;
+                attackingCreature.IsTurned = true;
+                defendingCreature.IsTurned = true;
+
+                if (defendingCreature.Defense <= 0)
+                {
+                    defender.DiscardCard(defendingCreature, publisher);
+                }
+                if (attackingCreature.Defense <= 0)
+                {
+                    attacker.DiscardCard(attackingCreature, publisher);
+                }
+                // TODO: Add console.writelines to show what has defeated what
+            }
+        }    
+
+        public void UnturnAllCreatureCards(Player player)
+        {
+            foreach (Card card in player.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned)
+                    {
+                        creature.IsTurned = false;
+                    }
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace HRTheGathering.Cards
             return new InstantCard { Name = name, Cost = cost, CardColor = color, CardEffect = effect };
         }
 
-        public List<Card> CreateDeck(Color color, Player player, Publisher publisher)
+        public List<Card> CreateDeck(Color color, Player player, Player enemyPlayer, Publisher publisher)
         {
             List<Card> deck = new List<Card>();
             int maxCopiesPerCard = 3;
@@ -76,10 +76,12 @@ namespace HRTheGathering.Cards
                     //deck.Add(CreateSpellCard("Radiant Blessing", Card.Color.White, 3, "Gives all your creatures +2/+2 until the end of the turn."));
                     //deck.Add(CreateSpellCard("Celestial Purge", Card.Color.White, 5, "Discards target creature."));
 
-                    NullifySpell nullifySpell = new NullifySpell("Nullify the opponents spell.");
-                    deck.Add(CreateInstantCard("Divine Reprieve", 1, Color.White, nullifySpell));
-                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Gives all your creatures +2/+2.");
+                    NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
+                    deck.Add(CreateInstantCard("Divine Reprieve", 1, Color.White, nullifySpellWhite));
+                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Increases all your creatures stats by +2/+2.");
                     deck.Add(CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2));
+                    ChangeCardsInHand discardCard1 = new ChangeCardsInHand(-1, enemyPlayer, publisher, "Discard 1 random cards of the opponents hand.");
+                    deck.Add(CreateSpellCard("Celestial Purge", 3, Color.White, discardCard1));
                 }
             }
             else if (color == Color.Red)
@@ -102,6 +104,12 @@ namespace HRTheGathering.Cards
                     //deck.Add(CreateSpellCard("Volcanic Fury", Card.Color.Red, 1, "Target creature gets +3/0 until the end of the turn."));
                     //deck.Add(CreateInstantCard("Flame Burst", Card.Color.Red, 2, " Deal 3 damage to target creature or player."));
                     //deck.Add(CreateSpellCard("Emberforged Enhancement", Card.Color.Red, 2, "Target creature gets +1/+1 until it leaves the battlefield."));
+                    NullifySpell nullifySpellRed = new NullifySpell("Nullify the opponents spell.");
+                    deck.Add(CreateInstantCard("Flame Burst", 1, Color.Red, nullifySpellRed));
+                    ChangeStats changeStatsEnemy2 = new ChangeStats(-1, -1, enemyPlayer, publisher, "Reduces stats of all opponent creatures by -1/-1.");
+                    deck.Add(CreateSpellCard("Emberforged Enhancement", 2, Color.Red, changeStatsEnemy2));
+                    ChangeCardsInHand addCards2 = new ChangeCardsInHand(2, player, publisher, "Draw 2 cards.");
+                    deck.Add(CreateSpellCard("Volcanic Fury", 2, Color.Red, addCards2));
                 }
             }
 
