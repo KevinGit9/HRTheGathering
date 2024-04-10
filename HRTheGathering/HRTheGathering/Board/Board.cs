@@ -292,6 +292,7 @@ namespace HRTheGathering.Board
             Console.WriteLine($"Lands in field: {numberOfLands}");
             int numberOfCreatures = player.CardsOnBoard.Count(card => card is CreatureCard);
             Console.WriteLine($"Creatures in field: {numberOfCreatures}");
+            Console.WriteLine($"Cards in discard pile: {player.DiscardPile.Count}");
             Console.WriteLine($"Lives: {player.Health}\n");
         }
 
@@ -416,6 +417,7 @@ namespace HRTheGathering.Board
                     if (nullifySpell)
                     {
                         nullifySpell = false;
+                        // TODO: Remove the spell from the board and add it to the discard pile
                         continue;
                     }
 
