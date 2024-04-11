@@ -201,7 +201,8 @@ namespace HRTheGathering.Board
         public void StartTurn(Player player)
         {
             Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
-            Console.WriteLine($"\n\nCurrent Turn: {currentRound} - Player: {player.Name}\n\n");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player.Name}\n\n");
             Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
 
             // Preparation:
@@ -244,14 +245,47 @@ namespace HRTheGathering.Board
                 player.UseCardWithCost(creatureCard, publisher);
             }
 
+            bool spellCardPlayed = false;
             // If the player has a SpellCard, try to play it
             SpellCard? spellCard = player.Hand.FirstOrDefault(card => card is SpellCard) as SpellCard;
             if (spellCard != null)
             {
-                player.UseCardWithCost(spellCard, publisher, spellStack);
+                spellCardPlayed = player.UseCardWithCost(spellCard, publisher, spellStack);
             }
 
-            // Attack
+            // Have the current player play an instant card if the opponent plays an instant card
+            Player opposingPlayer;
+            if (player == player1)
+            {
+                opposingPlayer = player2;
+            }
+            else
+            {
+                opposingPlayer = player1;
+            }
+
+            // If spell card has been played, check if the opponent has an instant card to play
+            if (spellCardPlayed)
+            {
+                InstantCard? instantCardOpponent = opposingPlayer.Hand.FirstOrDefault(card => card is InstantCard) as InstantCard;
+                
+                if (instantCardOpponent != null)
+                {
+                    bool opponentNullifies = opposingPlayer.UseCardWithCost(instantCardOpponent, publisher, spellStack);
+
+                    // If opponent has an instant card to play, check if the current player can play an instant card
+                    if (opponentNullifies)
+                    {
+                        InstantCard? instantCard = player.Hand.FirstOrDefault(card => card is InstantCard) as InstantCard;
+                        if (instantCard != null)
+                        {
+                            player.UseCardWithCost(instantCard, publisher, spellStack);
+                        }
+                    }
+                }
+            }
+
+            // Try to attack the opponent
             Attack(player);
 
             // Ending:
@@ -286,7 +320,7 @@ namespace HRTheGathering.Board
 
         public void PrintEndSituation(Player player)
         {
-            Console.WriteLine($"{player.Name}:");
+            Console.WriteLine($"\n\n{player.Name}:");
             Console.WriteLine($"Cards in hand: {player.Hand.Count}");
             int numberOfLands = player.CardsOnBoard.Count(card => card is LandCard);
             Console.WriteLine($"Lands in field: {numberOfLands}");
@@ -331,6 +365,7 @@ namespace HRTheGathering.Board
             player2.HandObservable.Detach(player2HandObserver);
             player1.BoardObservable.Detach(player2BoardObserver);
 
+            Environment.Exit(0);
         }
 
         public void ClearAllTurnedLandCards(Player player)
@@ -341,6 +376,21 @@ namespace HRTheGathering.Board
                 {
                     LandCard landCard = (LandCard)card;
                     landCard.IsTurned = false;
+                }
+            }
+        }
+
+        public void UnturnAllCreatureCards(Player player)
+        {
+            foreach (Card card in player.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned)
+                    {
+                        creature.IsTurned = false;
+                    }
                 }
             }
         }
@@ -418,6 +468,14 @@ namespace HRTheGathering.Board
                     {
                         nullifySpell = false;
                         // TODO: Remove the spell from the board and add it to the discard pile
+                        if (currentSpell is SpellCard)
+                        {
+                            Console.WriteLine($"[{currentSpell.CardColor} Spell][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has been nullified");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has been nullified");
+                        }
                         continue;
                     }
 
@@ -425,11 +483,20 @@ namespace HRTheGathering.Board
                     if (currentSpell.CardEffect is NullifySpell)
                     {
                         nullifySpell = true;
+                        Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
                         continue;
                     }
 
                     // Apply effect of the spell
                     currentSpell.CardEffect.ApplyEffect();
+                    if (currentSpell is SpellCard)
+                    {
+                        Console.WriteLine($"[{currentSpell.CardColor} Spell][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
+                    }
                 }
             }
             // TODO: Spells to increase/decrease stats work but only get displayed during the next turn
@@ -437,7 +504,7 @@ namespace HRTheGathering.Board
             // Attack player if there is an attacking creature but no defending creature
             if (attackingCreature != null && defendingCreature == null)
             {
-                Console.WriteLine($"[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) Attacked {defender.Name} with {attackingCreature.Attack}");
+                Console.WriteLine($"\n[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) Attacked {defender.Name} with {attackingCreature.Attack}");
                 defender.Health -= attackingCreature.Attack;
                 attackingCreature.IsTurned = true;
                 
@@ -445,11 +512,14 @@ namespace HRTheGathering.Board
                 if (defender.Health <= 0)
                 {
                     EndGame(defender);
+                    
                 }
             }
             // Attack defending creature if there is an attacking creature and defending creature
             else if (attackingCreature != null && defendingCreature != null)
             {
+                Console.WriteLine($"\n[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) is attacking");
+                Console.WriteLine($"[{defendingCreature.CardColor} Creature] {defendingCreature.Name} ({defendingCreature.Attack}, {defendingCreature.Defense}) is defending\n");
                 defendingCreature.Defense -= attackingCreature.Attack;
                 attackingCreature.Defense -= defendingCreature.Attack;
                 attackingCreature.IsTurned = true;
@@ -458,28 +528,14 @@ namespace HRTheGathering.Board
                 if (defendingCreature.Defense <= 0)
                 {
                     defender.DiscardCard(defendingCreature, publisher);
+                    Console.WriteLine($"[{defendingCreature.CardColor} Creature] {defendingCreature.Name} ({defendingCreature.Attack}, {defendingCreature.Defense}) was slain in battle");
                 }
                 if (attackingCreature.Defense <= 0)
                 {
                     attacker.DiscardCard(attackingCreature, publisher);
+                    Console.WriteLine($"[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) was slain in battle");
                 }
-                // TODO: Add console.writelines to show what has defeated what
             }
         }    
-
-        public void UnturnAllCreatureCards(Player player)
-        {
-            foreach (Card card in player.CardsOnBoard)
-            {
-                if (card is CreatureCard)
-                {
-                    CreatureCard creature = (CreatureCard)card;
-                    if (creature.IsTurned)
-                    {
-                        creature.IsTurned = false;
-                    }
-                }
-            }
-        }
     }
 }

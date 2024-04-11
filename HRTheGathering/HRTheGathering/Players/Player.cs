@@ -96,6 +96,7 @@ namespace HRTheGathering.Players
 
         public void UseCard(Card card, Publisher publisher, Stack<Card>? stack = null)
         {
+            Console.WriteLine($"\n{Name} plays {card.Name}\n");
             List<Card> newCardsOnBoard = new List<Card>(CardsOnBoard);
             newCardsOnBoard.Add(card);
             CardsOnBoard = newCardsOnBoard;
@@ -124,12 +125,12 @@ namespace HRTheGathering.Players
             }
         }
 
-        public void UseCardWithCost(Card card, Publisher publisher, Stack<Card>? stack = null)
+        public bool UseCardWithCost(Card card, Publisher publisher, Stack<Card>? stack = null)
         {
             // If not enough Lands to play the card, return out
             if (CardsOnBoard.Count(land => land is LandCard && ((LandCard)land).CardColor == card.CardColor && !((LandCard)land).IsTurned) < card.Cost)
             {
-                return;
+                return false;
             }
             
             // Turn lands until cost
@@ -157,6 +158,8 @@ namespace HRTheGathering.Players
             {
                 UseCard(card, publisher);
             }
+
+            return true;
         }
 
         public void DiscardCard(Card card, Publisher publisher)
