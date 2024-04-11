@@ -96,6 +96,95 @@ namespace HRTheGathering.Board
             }
         }
 
+        public void DocumentTest()
+        {
+            // Fill deck
+
+            // player 1 hand
+            player1.Deck.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Radiant Glade", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Luminous Plains", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Celestial Grove", Card.Color.White));
+
+            player2.Deck.Add(cardFactory.CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 2));
+
+            NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
+            player1.Deck.Add(cardFactory.CreateInstantCard("Divine Reprieve", 1, Card.Color.White, nullifySpellWhite));
+            ChangeStats changeStats3 = new ChangeStats(3, 3, player1, publisher, "Increases all your creatures stats by +3/+3.");
+            player1.Deck.Add(cardFactory.CreateSpellCard("Radiant Blessing", 1, Card.Color.White, changeStats3));
+
+            // player 2 hand
+            player2.Deck.Add(cardFactory.CreateLandCard("Molten Peak", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Ember Highlands", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
+
+            NullifySpell nullifySpellRed = new NullifySpell("Nullify the opponents spell.");
+            player2.Deck.Add(cardFactory.CreateInstantCard("Flame Burst", 1, Card.Color.Red, nullifySpellRed));
+
+            // player 1, turn 1
+            player1.DrawCard();
+
+            Card landCard1Player1 = GetCard(player1, "Sunlit Meadows");
+            player1.UseCard(landCard1Player1, publisher);
+
+            Card landCard2Player1 = GetCard(player1, "Radiant Glade");
+            player1.UseCard(landCard2Player1, publisher);
+            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+
+            // player 2, turn 1
+            player2.DrawCard();
+
+            Card landCard1Player2 = GetCard(player2, "Molten Peak");
+            player2.UseCard(landCard1Player2, publisher);
+            Console.WriteLine($"Player 2: Hand:{player2.Hand.Count()}, Board:{player2.CardsOnBoard.Count()}, Health:{player2.Health}");
+
+            // player 1, turn 2
+            player1.DrawCard();
+
+            Card landCard3Player1 = GetCard(player1, "Luminous Plains");
+            player1.UseCard(landCard3Player1, publisher);
+
+            LandCard landCard1Player1land = (LandCard)landCard1Player1;
+            landCard1Player1land.IsTurned = true;
+            LandCard landCard2Player1land = (LandCard)landCard2Player1;
+            landCard2Player1land.IsTurned = true;
+
+            Card creatureCard1Player1 = GetCard(player1, "Griffon"); // add effect to creature, removes random card from opponent
+            CreatureCard creatureCard1Player1Creature = (CreatureCard)creatureCard1Player1;
+            player1.UseCard(creatureCard1Player1Creature, publisher);
+            // discard random card from opponent
+
+            UnturnAllTurnedLandCards(player1); // ?
+            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+
+            // player 2, turn 2
+            player2.DrawCard();
+            Console.WriteLine($"Player 2: Hand:{player2.Hand.Count()}, Board:{player2.CardsOnBoard.Count()}, Health:{player2.Health}");
+
+            // player 1, turn 3
+            player1.DrawCard();
+
+            landCard1Player1land.IsTurned = true;
+            landCard2Player1land.IsTurned = true;
+            Attack(player1);
+            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+        }
+
+        public Card GetCard(Player player, string cardName)
+        {
+            foreach (Card card in player.Hand)
+            {
+                if (card.Name == cardName)
+                {
+                    return card;
+                }
+            }
+            return null;
+        }
+
         private void RunGame()
         {
             while (winner == null)
@@ -132,7 +221,7 @@ namespace HRTheGathering.Board
             // Preparation:
             // Reset temporary effects and reset to original state (example: lands turn back to normal)
             // Reset all Land Cards on the board
-            ClearAllTurnedLandCards(player);
+            UnturnAllTurnedLandCards(player);
             UnturnAllCreatureCards(player);
 
             // Drawing:
@@ -286,7 +375,7 @@ namespace HRTheGathering.Board
             Environment.Exit(0);
         }
 
-        public void ClearAllTurnedLandCards(Player player)
+        public void UnturnAllTurnedLandCards(Player player)
         {
             foreach (Card card in player.CardsOnBoard)
             {
