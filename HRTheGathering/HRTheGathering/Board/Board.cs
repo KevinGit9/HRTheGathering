@@ -38,7 +38,7 @@ namespace HRTheGathering.Board
             player2HandObserver = new PlayerHandObserver();
 
             player1BoardObserver = new PlayerBoardObserver();
-            player2BoardObserver =  new PlayerBoardObserver();
+            player2BoardObserver = new PlayerBoardObserver();
 
 
             // Attach the observers to the players
@@ -73,10 +73,8 @@ namespace HRTheGathering.Board
 
             Console.WriteLine("Done preparing the game - press any key to start the game...");
             Console.ReadKey();
-            while(winner == null)
-            {
-                StartRound();
-            }
+
+            RunGame();
         }
 
         public void PrepareGame()
@@ -95,6 +93,14 @@ namespace HRTheGathering.Board
             {
                 player1.DrawCard();
                 player2.DrawCard();
+            }
+        }
+
+        private void RunGame()
+        {
+            while (winner == null)
+            {
+                StartRound();
             }
         }
 
