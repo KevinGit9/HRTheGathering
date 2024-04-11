@@ -101,28 +101,28 @@ namespace HRTheGathering.Board
             // Fill deck
 
             // player 1 hand
-            player1.Deck.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
-            player1.Deck.Add(cardFactory.CreateLandCard("Radiant Glade", Card.Color.White));
-            player1.Deck.Add(cardFactory.CreateLandCard("Luminous Plains", Card.Color.White));
-            player1.Deck.Add(cardFactory.CreateLandCard("Celestial Grove", Card.Color.White));
+            player1.Hand.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
+            player1.Hand.Add(cardFactory.CreateLandCard("Radiant Glade", Card.Color.White));
+            player1.Hand.Add(cardFactory.CreateLandCard("Luminous Plains", Card.Color.White));
+            player1.Hand.Add(cardFactory.CreateLandCard("Celestial Grove", Card.Color.White));
 
-            player2.Deck.Add(cardFactory.CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 2));
+            player2.Hand.Add(cardFactory.CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 2));
 
             NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
-            player1.Deck.Add(cardFactory.CreateInstantCard("Divine Reprieve", 1, Card.Color.White, nullifySpellWhite));
+            player1.Hand.Add(cardFactory.CreateInstantCard("Divine Reprieve", 1, Card.Color.White, nullifySpellWhite));
             ChangeStats changeStats3 = new ChangeStats(3, 3, player1, publisher, "Increases all your creatures stats by +3/+3.");
-            player1.Deck.Add(cardFactory.CreateSpellCard("Radiant Blessing", 1, Card.Color.White, changeStats3));
+            player1.Hand.Add(cardFactory.CreateSpellCard("Radiant Blessing", 1, Card.Color.White, changeStats3));
 
             // player 2 hand
-            player2.Deck.Add(cardFactory.CreateLandCard("Molten Peak", Card.Color.Red));
-            player2.Deck.Add(cardFactory.CreateLandCard("Ember Highlands", Card.Color.Red));
-            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
-            player2.Deck.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
-            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
-            player2.Deck.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Molten Peak", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Ember Highlands", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
+            player2.Hand.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
 
             NullifySpell nullifySpellRed = new NullifySpell("Nullify the opponents spell.");
-            player2.Deck.Add(cardFactory.CreateInstantCard("Flame Burst", 1, Card.Color.Red, nullifySpellRed));
+            player2.Hand.Add(cardFactory.CreateInstantCard("Flame Burst", 1, Card.Color.Red, nullifySpellRed));
 
             // player 1, turn 1
             player1.DrawCard();
