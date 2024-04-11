@@ -78,7 +78,7 @@ namespace HRTheGathering.Players
         public bool DrawCard()
         {
             // if Deck is empty return false to declare a winner
-            if (Deck.Count == 0)
+            if (Deck.Count <= 0)
             {
                 return false;
             }
@@ -192,6 +192,12 @@ namespace HRTheGathering.Players
                 Random random = new Random();
                 for (int x = 0; x < -amountCards; x++)
                 {
+                    // If hand is empty, break
+                    if (player.Hand.Count() <= 0)
+                    {
+                        break;
+                    }
+
                     int randomIndex = random.Next(0, player.Hand.Count());
                     Card cardToDelete = player.Hand[randomIndex];
                     player.DiscardCard(cardToDelete, publisher);
@@ -208,30 +214,6 @@ namespace HRTheGathering.Players
             }
 
             return;
-        }
-
-        public bool HasBlockAttackInstant()
-        {
-            foreach (Card card in Hand)
-            {
-                if (card is SpellCard && card.Name == "BlockAttackInstant")
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool HasBlockInstantInstant()
-        {
-            foreach (Card card in Hand)
-            {
-                if (card is SpellCard && card.Name == "BlockInstantInstant")
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

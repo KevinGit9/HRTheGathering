@@ -50,7 +50,9 @@ namespace HRTheGathering.Board
             player2.HandObservable.Attach(player2HandObserver);
             player2.BoardObservable.Attach(player2BoardObserver);
 
-
+            // Subscribe players to publisher channels
+            publisher.SubscribeCardsInHand(player1);
+            publisher.SubscribeCardsInHand(player2);
         }
 
         public static Board Instance
@@ -429,12 +431,6 @@ namespace HRTheGathering.Board
                         }
                     }
                 }
-            }
-
-            // If no attacking creature, return out
-            if (attackingCreature == null)
-            {
-                return;
             }
 
             // Get defending creature with highest defense
