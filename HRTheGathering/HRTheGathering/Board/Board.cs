@@ -294,6 +294,7 @@ namespace HRTheGathering.Board
             // Player must discard cards from their hand until the cards in hand dont exceed MaxCardsInHand (7)
             while (player.Hand.Count > player.MaxCardsInHand)
             {
+                Console.WriteLine($"\n{player.Name} hand exceeds max cards\n");
                 Random random = new Random(); 
                 // Get a random card from the hand to discard
                 int randomIndex = random.Next(player.Hand.Count);
@@ -484,18 +485,17 @@ namespace HRTheGathering.Board
                     }
 
                     // Apply effect of the spell
-                    currentSpell.CardEffect.ApplyEffect();
                     if (currentSpell is SpellCard)
                     {
-                        Console.WriteLine($"[{currentSpell.CardColor} Spell][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
+                        Console.WriteLine($"[{currentSpell.CardColor} Spell][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect\n");
                     }
                     else
                     {
-                        Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
+                        Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect\n");
                     }
+                    currentSpell.CardEffect.ApplyEffect();
                 }
             }
-            // TODO: Spells to increase/decrease stats work but only get displayed during the next turn
 
             // Attack player if there is an attacking creature but no defending creature
             if (attackingCreature != null && defendingCreature == null)
