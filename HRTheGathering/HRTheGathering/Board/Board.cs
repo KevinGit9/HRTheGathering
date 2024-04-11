@@ -69,10 +69,7 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
-            //RunTests();
-
             PrepareGame();
-            // Add whatever is needed
 
             Console.WriteLine("Done preparing the game - press any key to start the game...");
             Console.ReadKey();
@@ -99,87 +96,6 @@ namespace HRTheGathering.Board
                 player1.DrawCard();
                 player2.DrawCard();
             }
-        }
-
-        public void RunTests()
-        {
-            // Creature Stats Change Test
-            //CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
-            //CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
-            //CreatureCard creature3 = new CreatureCard { Name = "Creature 3", Attack = 4, Defense = 3 };
-            //CreatureCard creature4 = new CreatureCard { Name = "Creature 4", Attack = 7, Defense = 8 };
-
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-
-            //publisher.SubscribeChangeStats(creature1, player1);
-            //publisher.SubscribeChangeStats(creature2, player1);
-            //publisher.SubscribeChangeStats(creature3, player2);
-            //publisher.SubscribeChangeStats(creature4, player2);
-
-            //publisher.ChangeStatsCreatures(2, 2, player1);
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-
-            //publisher.UnsubscribeChangeStats(creature2, player1);
-            //publisher.ChangeStatsCreatures(2, 2, player1);
-            //publisher.ChangeStatsCreatures(2, 2, player2);
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");  
-
-            //publisher.UnsubscribeChangeStats(creature3, player2);
-            //publisher.ChangeStatsCreatures(2, 2, player2);
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-            //Console.WriteLine("-----");
-
-            //ChangeStats changeStats = new ChangeStats(2, 2, player1, publisher);
-            //SpellCard spellCard2 = new SpellCard { CardEffect = changeStats };
-            //spellCard2.CardEffect.ApplyEffect();
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-
-            //Console.WriteLine("-----");
-            //ChangeStats changeStats2 = new ChangeStats(2, 2, player2, publisher);
-            //SpellCard spellCard = new SpellCard { CardEffect = changeStats2 };
-            //spellCard.CardEffect.ApplyEffect();
-            //Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-            //Console.ReadKey();
-
-            //// Change CardsInHand Test
-            //player1.Hand.Add(creature1);
-            //player1.Hand.Add(creature2);
-            //player1.Hand.Add(creature3);
-            //player1.Hand.Add(creature4);
-            //Console.WriteLine($"Cards in hand: { player1.Hand.Count()}");
-
-            //ChangeCardsInHand changeCardsInHand = new ChangeCardsInHand(-2, player1, publisher);
-            //SpellCard spellcardCardsInHand = new SpellCard { CardEffect = changeCardsInHand};
-
-            //publisher.SubscribeCardsInHand(player1);
-
-            //player1.UseCard(spellcardCardsInHand, publisher);
-            //Console.WriteLine($"Cards in hand: {player1.Hand.Count()}");
-            //Console.ReadKey();
-
-            // Health Observer Test
-            Console.WriteLine(player1.Health);
-            Console.WriteLine(player2.Health);
-            Console.WriteLine("Press enter to attack player 1 with 5 damage...");
-            Console.ReadKey();
-
-            // Hit player 1 with 5 damage
-            int damageAmount = 5; // Let's say the damage amount is 10
-            player1.Health -= damageAmount;
-
-            // Hand Observer Test
-            Console.WriteLine("Press enter to draw a card for player 1...");
-            Console.ReadKey();
-
-            player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, player2, publisher);
-            player1.DrawCard();
-            Console.WriteLine("Press enter to continue...");
-            Console.ReadKey();
-
-            Console.WriteLine("Press enter to discard card for player 1...");
-            player1.DiscardCard(player1.Hand.First(), publisher);
-            Console.ReadKey();
-
         }
 
         public void StartRound()
@@ -226,10 +142,9 @@ namespace HRTheGathering.Board
             // Main:
             // Player can play cards
             // Player can attack
-            // Opposing player can assign a defender and/or play an instant spell/card
+            // Opposing player can assign a defender and/or play an instant card
          
-            // If the player has a Land Card, play it
-            // Play a land card
+            // Play every land card the player owns
             while (player.Hand.Any(card => card is LandCard))
             {
                 LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
@@ -254,7 +169,6 @@ namespace HRTheGathering.Board
                 spellCardPlayed = player.UseCardWithCost(spellCard, publisher, spellStack);
             }
 
-            // Have the current player play an instant card if the opponent plays an instant card
             Player opposingPlayer;
             if (player == player1)
             {
@@ -274,7 +188,7 @@ namespace HRTheGathering.Board
                 {
                     bool opponentNullifies = opposingPlayer.UseCardWithCost(instantCardOpponent, publisher, spellStack);
 
-                    // If opponent has an instant card to play, check if the current player can play an instant card
+                    // If opponent plays an instant card, check if the current player can play an instant card
                     if (opponentNullifies)
                     {
                         InstantCard? instantCard = player.Hand.FirstOrDefault(card => card is InstantCard) as InstantCard;
@@ -285,6 +199,9 @@ namespace HRTheGathering.Board
                     }
                 }
             }
+
+            // Apply the spell and/or instant cards that have been played
+            ApplySpells();
 
             // Try to attack the opponent
             Attack(player);
@@ -350,14 +267,6 @@ namespace HRTheGathering.Board
             Console.WriteLine("-----------------------------------------------------------");
             Console.ReadKey();
 
-
-            // End the game by closing the instance and declaring a winner
-
-            // Game ends by:
-            // if player HP <= 0
-            // if player Deck.Count <= 0
-            // if player forfeits the game
-
             // Detach all observers
             player1.HealthObservable.Detach(player1LifeObserver);
             player1.HandObservable.Detach(player1HandObserver);
@@ -367,6 +276,7 @@ namespace HRTheGathering.Board
             player2.HandObservable.Detach(player2HandObserver);
             player1.BoardObservable.Detach(player2BoardObserver);
 
+            // End the game by closing the instance
             Environment.Exit(0);
         }
 
@@ -397,61 +307,9 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void Attack(Player attacker)
+        public void ApplySpells()
         {
-            Player? defender;
             bool nullifySpell = false;
-            CreatureCard? attackingCreature = null;
-            CreatureCard? defendingCreature = null;
-
-            if (attacker == player1)
-            {
-                defender = player2;
-            }
-            else
-            {
-                defender = player1;
-            }
-
-            // Get attacking creature with highest attack
-            foreach (Card card in attacker.CardsOnBoard)
-            {
-                if (card is CreatureCard)
-                {
-                    CreatureCard creature = (CreatureCard)card;
-                    if (creature.IsTurned == false)
-                    {
-                        if (attackingCreature == null)
-                        {
-                            attackingCreature = creature;
-                        }
-                        else if (creature.Attack > attackingCreature.Attack)
-                        {
-                            attackingCreature = creature;
-                        }
-                    }
-                }
-            }
-
-            // Get defending creature with highest defense
-            foreach (Card card in defender.CardsOnBoard)
-            {
-                if (card is CreatureCard)
-                {
-                    CreatureCard creature = (CreatureCard)card;
-                    if (creature.IsTurned == false)
-                    {
-                        if (defendingCreature == null)
-                        {
-                            defendingCreature = creature;
-                        }
-                        else if (creature.Defense > defendingCreature.Defense)
-                        {
-                            defendingCreature = creature;
-                        }
-                    }
-                }
-            }
 
             while (spellStack.Count > 0)
             {
@@ -516,6 +374,62 @@ namespace HRTheGathering.Board
                     currentSpell.CardEffect.ApplyEffect();
                 }
             }
+        }
+
+        public void Attack(Player attacker)
+        {
+            Player? defender;
+            CreatureCard? attackingCreature = null;
+            CreatureCard? defendingCreature = null;
+
+            if (attacker == player1)
+            {
+                defender = player2;
+            }
+            else
+            {
+                defender = player1;
+            }
+
+            // Assign the creature with the highest attack as the attacker
+            foreach (Card card in attacker.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned == false)
+                    {
+                        if (attackingCreature == null)
+                        {
+                            attackingCreature = creature;
+                        }
+                        else if (creature.Attack > attackingCreature.Attack)
+                        {
+                            attackingCreature = creature;
+                        }
+                    }
+                }
+            }
+
+            // Assign the creature with the highest defense as the defender
+            foreach (Card card in defender.CardsOnBoard)
+            {
+                if (card is CreatureCard)
+                {
+                    CreatureCard creature = (CreatureCard)card;
+                    if (creature.IsTurned == false)
+                    {
+                        if (defendingCreature == null)
+                        {
+                            defendingCreature = creature;
+                        }
+                        else if (creature.Defense > defendingCreature.Defense)
+                        {
+                            defendingCreature = creature;
+                        }
+                    }
+                }
+            }
 
             // Attack player if there is an attacking creature but no defending creature
             if (attackingCreature != null && defendingCreature == null)
@@ -552,6 +466,6 @@ namespace HRTheGathering.Board
                     Console.WriteLine($"[{attackingCreature.CardColor} Creature] {attackingCreature.Name} ({attackingCreature.Attack}, {attackingCreature.Defense}) was slain in battle");
                 }
             }
-        }    
+        }
     }
 }

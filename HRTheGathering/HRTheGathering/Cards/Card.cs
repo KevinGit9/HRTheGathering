@@ -1,4 +1,5 @@
-﻿using HRTheGathering.Effects;
+﻿using System;
+using HRTheGathering.Effects;
 using HRTheGathering.Players;
 
 namespace HRTheGathering.Cards
@@ -10,16 +11,7 @@ namespace HRTheGathering.Cards
         public int Cost { get; set; }
         public int CopiesInDeck { get; set; }
         public IEffect? CardEffect { get; set; }
-        public Type CardType { get; set; }
         public Color? CardColor { get; set; }
-
-        public enum Type
-        {
-            Land,
-            Creature,
-            Spell,
-            Instant
-        } // Make it be limited to Land, Spell (Spell can be a permanent that can attack or be instant or generate a permanent)
 
         public enum Color
         {
@@ -28,7 +20,7 @@ namespace HRTheGathering.Cards
             Brown,
             White,
             Green
-            // Implement colorless
+            // TODO: Implement colorless
         }
     }
 }

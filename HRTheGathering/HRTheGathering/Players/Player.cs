@@ -1,4 +1,5 @@
-﻿using HRTheGathering.Cards;
+﻿using System;
+using HRTheGathering.Cards;
 using HRTheGathering.Observers;
 using HRTheGathering.Publishers;
 
@@ -9,6 +10,8 @@ namespace HRTheGathering.Players
         private int health = 10;
         private List<Card> hand = new List<Card>();
         private List<Card> board = new List<Card>();
+        private const int MaxDeckSize = 30;
+        private List<Card> _deck = new List<Card>();
         private Observable<int> healthObservable = new Observable<int>();
         private Observable<List<Card>> handObservable = new Observable<List<Card>>();
         private Observable<List<Card>> boardObservable = new Observable<List<Card>>();
@@ -49,15 +52,29 @@ namespace HRTheGathering.Players
             }
         }
 
-        public List<Card> Deck { get; set; } = new List<Card>(); // Deck has 30 cards
-        public List<Card> DiscardPile { get; set; } = new List<Card>(); // Graveyard
+        public List<Card> Deck
+        {
+            get => _deck;
+            set
+            {
+                if (value.Count <= MaxDeckSize)
+                {
+                    _deck = value;
+                }
+                else
+                {
+                    throw new ArgumentException($"The deck cannot contain more than {MaxDeckSize} cards.");
+                }
+            }
+        }
 
+        public List<Card> DiscardPile { get; set; } = new List<Card>();
+        public int MaxCardsInHand = 7;
+ 
         // Observable properties
         public Observable<int> HealthObservable => healthObservable;
         public Observable<List<Card>> HandObservable => handObservable;
         public Observable<List<Card>> BoardObservable => boardObservable;
-
-        public int MaxCardsInHand = 7;
 
 
         // Game methods

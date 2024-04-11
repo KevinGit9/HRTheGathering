@@ -1,4 +1,4 @@
-﻿using HRTheGathering.Cards;
+﻿using System;
 using HRTheGathering.Players;
 using HRTheGathering.Publishers;
 

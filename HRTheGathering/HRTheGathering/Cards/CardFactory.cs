@@ -1,12 +1,7 @@
-﻿using HRTheGathering.Effects;
+﻿using System;
+using HRTheGathering.Effects;
 using HRTheGathering.Players;
 using HRTheGathering.Publishers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using static HRTheGathering.Cards.Card;
 
 namespace HRTheGathering.Cards
@@ -72,10 +67,6 @@ namespace HRTheGathering.Cards
                     deck.Add(CreateCreatureCard("Aegis Angel", 3, Color.White, 4, 4));
 
                     // Add white spells
-                    //deck.Add(CreateInstantCard("Divine Reprieve", Card.Color.White, 1, "Nullify the opponent's attack."));
-                    //deck.Add(CreateSpellCard("Radiant Blessing", Card.Color.White, 3, "Gives all your creatures +2/+2 until the end of the turn."));
-                    //deck.Add(CreateSpellCard("Celestial Purge", Card.Color.White, 5, "Discards target creature."));
-
                     NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
                     deck.Add(CreateInstantCard("Divine Reprieve", 1, Color.White, nullifySpellWhite));
                     ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Increases all your creatures stats by +2/+2.");
@@ -101,9 +92,6 @@ namespace HRTheGathering.Cards
                     deck.Add(CreateCreatureCard("Ancient Dragon", 4, Color.Red, 6, 6));
 
                     // Add red spells
-                    //deck.Add(CreateSpellCard("Volcanic Fury", Card.Color.Red, 1, "Target creature gets +3/0 until the end of the turn."));
-                    //deck.Add(CreateInstantCard("Flame Burst", Card.Color.Red, 2, " Deal 3 damage to target creature or player."));
-                    //deck.Add(CreateSpellCard("Emberforged Enhancement", Card.Color.Red, 2, "Target creature gets +1/+1 until it leaves the battlefield."));
                     NullifySpell nullifySpellRed = new NullifySpell("Nullify the opponents spell.");
                     deck.Add(CreateInstantCard("Flame Burst", 1, Color.Red, nullifySpellRed));
                     ChangeStats changeStatsEnemy2 = new ChangeStats(-1, -1, enemyPlayer, publisher, "Reduces stats of all opponent creatures by -1/-1.");

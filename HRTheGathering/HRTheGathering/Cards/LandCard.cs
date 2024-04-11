@@ -10,10 +10,5 @@ namespace HRTheGathering.Cards
     public class LandCard : Card
     {
         public bool IsTurned { get; set; } = true;
-
-        public void TurnCard()
-        {
-            this.IsTurned = true;
-        }
     }
 }

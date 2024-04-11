@@ -1,5 +1,4 @@
-﻿
-using HRTheGathering.Publishers;
+﻿using System;
 
 namespace HRTheGathering.Effects
 {

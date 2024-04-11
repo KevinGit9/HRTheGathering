@@ -1,4 +1,5 @@
-﻿using HRTheGathering.Cards;
+﻿using System;
+using HRTheGathering.Cards;
 
 namespace HRTheGathering.Observers
 {

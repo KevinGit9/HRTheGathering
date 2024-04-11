@@ -1,4 +1,5 @@
-﻿using HRTheGathering.Players;
+﻿using System;
+using HRTheGathering.Players;
 
 namespace HRTheGathering.Cards
 {
