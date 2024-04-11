@@ -465,6 +465,16 @@ namespace HRTheGathering.Board
                     else
                     {
                         Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect\n");
+
+                        // Discard card because it's an InstantCard
+                        if (player1.CardsOnBoard.Contains(currentSpell))
+                        {
+                            player1.DiscardCard(currentSpell, publisher);
+                        }
+                        else
+                        {
+                            player2.DiscardCard(currentSpell, publisher);
+                        }
                     }
                     currentSpell.CardEffect.ApplyEffect();
                 }
