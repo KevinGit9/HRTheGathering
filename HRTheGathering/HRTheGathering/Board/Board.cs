@@ -215,13 +215,12 @@ namespace HRTheGathering.Board
 
             // Drawing:
             // Player draws card from deck and add its to their hand
-            bool drawnCard = player.DrawCard();
+            bool drewCard = player.DrawCard();
 
             // if drawnCard is false, it means the Deck has no more cards left to draw
-            if (!drawnCard)
+            if (!drewCard)
             {
                 EndGame(player);
-                return;
             }
 
             // Main:
@@ -300,7 +299,7 @@ namespace HRTheGathering.Board
                 int randomIndex = random.Next(player.Hand.Count);
                 Card randomCard = player.Hand[randomIndex];
 
-                player.DiscardCard(randomCard, publisher);
+                player.DiscardCard(randomCard, publisher, true);
             }
 
             EndTurn();
@@ -464,7 +463,6 @@ namespace HRTheGathering.Board
                     if (nullifySpell)
                     {
                         nullifySpell = false;
-                        // TODO: Remove the spell from the board and add it to the discard pile
                         if (currentSpell is SpellCard)
                         {
                             Console.WriteLine($"[{currentSpell.CardColor} Spell][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has been nullified");
@@ -473,6 +471,17 @@ namespace HRTheGathering.Board
                         {
                             Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has been nullified");
                         }
+
+                        // Remove the spell from the board and add it to the discard pile
+                        if (player1.CardsOnBoard.Contains(currentSpell))
+                        {
+                            player1.DiscardCard(currentSpell, publisher);
+                        }
+                        else
+                        {
+                            player2.DiscardCard(currentSpell, publisher);
+                        }
+
                         continue;
                     }
 
@@ -481,6 +490,17 @@ namespace HRTheGathering.Board
                     {
                         nullifySpell = true;
                         Console.WriteLine($"[{currentSpell.CardColor} Instant][{currentSpell.Cost}] {currentSpell.Name} ({currentSpell.CardEffect.Description}) has applied it's effect");
+
+                        // Remove the spell from the board and add it to the discard pile
+                        if (player1.CardsOnBoard.Contains(currentSpell))
+                        {
+                            player1.DiscardCard(currentSpell, publisher);
+                        }
+                        else
+                        {
+                            player2.DiscardCard(currentSpell, publisher);
+                        }
+
                         continue;
                     }
 

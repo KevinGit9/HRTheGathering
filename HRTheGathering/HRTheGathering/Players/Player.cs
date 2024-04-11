@@ -162,10 +162,10 @@ namespace HRTheGathering.Players
             return true;
         }
 
-        public void DiscardCard(Card card, Publisher publisher)
+        public void DiscardCard(Card card, Publisher publisher, bool fromHand = false)
         {
             // Add check if its on the board or in the hand
-            if (Hand.Contains(card))
+            if (fromHand)
             {
                 List<Card> newHand = new List<Card>(Hand);
                 newHand.Remove(card);
@@ -200,7 +200,7 @@ namespace HRTheGathering.Players
 
                     int randomIndex = random.Next(0, player.Hand.Count());
                     Card cardToDelete = player.Hand[randomIndex];
-                    player.DiscardCard(cardToDelete, publisher);
+                    player.DiscardCard(cardToDelete, publisher, true);
                 }
             }
 
