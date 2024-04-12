@@ -104,6 +104,4 @@ namespace HRTheGathering.Cards
             return deck;
         }
     }
-
-    // TODO: Add method to replicate the turns from the document
 }

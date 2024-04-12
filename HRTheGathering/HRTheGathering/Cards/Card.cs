@@ -19,7 +19,6 @@ namespace HRTheGathering.Cards
             Brown,
             White,
             Green
-            // TODO: Implement colorless
         }
     }
 }
