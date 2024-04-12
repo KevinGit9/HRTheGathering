@@ -535,7 +535,7 @@ namespace HRTheGathering.Board
         }
 
         // Methods to replicate the small play of the document
-        public void DocumentTest()
+        public void SmallPlay()
         {
             // player 1 deck
             player1.Deck.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));

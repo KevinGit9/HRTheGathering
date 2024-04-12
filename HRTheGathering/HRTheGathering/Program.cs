@@ -9,6 +9,6 @@ class Program
 
         // Start the game
         board.StartGame();
-        //board.DocumentTest();
+        //board.SmallPlay();
     }
 }
