@@ -4,7 +4,6 @@ using HRTheGathering.Effects;
 using HRTheGathering.Observers;
 using HRTheGathering.Players;
 using HRTheGathering.Publishers;
-using static HRTheGathering.Cards.Card;
 
 namespace HRTheGathering.Board
 {
@@ -69,7 +68,6 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
-            // RunTests();
             PrepareGame();
 
             Console.WriteLine("Done preparing the game - press any key to start the game...");
@@ -78,7 +76,7 @@ namespace HRTheGathering.Board
             RunGame();
         }
 
-        public void PrepareGame()
+        private void PrepareGame()
         {
             // Create decks for both players
             player1.Deck = cardFactory.CreateDeck(Card.Color.White, player1, player2, publisher);
@@ -96,45 +94,7 @@ namespace HRTheGathering.Board
                 player2.DrawCard();
             }
         }
-
-        public void RunTests()
-        {
-            CardFactory cardFactory = new CardFactory();
-            Console.WriteLine("-------------TEST-------------");
-
-            // Creature Stats Change Test
-            CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
-            CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
-            CreatureCard creature3 = new CreatureCard { Name = "Creature 3", Attack = 4, Defense = 3 };
-            CreatureCard creature4 = new CreatureCard { Name = "Creature 4", Attack = 7, Defense = 8 };
-
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-
-            publisher.SubscribeChangeStats(creature1, player1);
-            publisher.SubscribeChangeStats(creature2, player1);
-            publisher.SubscribeChangeStats(creature3, player2);
-            publisher.SubscribeChangeStats(creature4, player2);
-
-
-            ChangeStats changeStats2 = new ChangeStats(2, 2, player1, publisher, "Increases all your creatures stats by +2/+2 until the start of the next turn.", 1);
-            SpellCard blessing = cardFactory.CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2);
-
-            ChangeStats changeStats2Perm = new ChangeStats(2, 2, player1, publisher, "Increases all your creatures stats by +2/+2.");
-            SpellCard permanentBlessing = cardFactory.CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2Perm);
-
-            player1.UseCard(blessing, publisher, spellStack);
-            player1.UseCard(permanentBlessing, publisher, spellStack);
-            ApplySpells();
-
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-            Console.ReadKey();
-
-            UpdateSpellCards(player1);
-            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
-            Console.ReadKey();
-
-        }
-
+        
         private void RunGame()
         {
             while (winner == null)
@@ -143,7 +103,7 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void StartRound()
+        private void StartRound()
         {
             StartTurn(player1);
 
@@ -161,7 +121,7 @@ namespace HRTheGathering.Board
             currentRound++;
         }
 
-        public void StartTurn(Player player)
+        private void StartTurn(Player player)
         {
             Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
             Console.WriteLine($"\n\nTurn {currentRound}");
@@ -170,10 +130,7 @@ namespace HRTheGathering.Board
 
             // Preparation:
             // Reset temporary effects and reset to original state (example: lands turn back to normal)
-            // Reset all Land Cards on the board
-            UnturnAllTurnedLandCards(player);
-            UnturnAllCreatureCards(player);
-            UpdateSpellCards(player);
+            PreparationPhase(player);
 
             // Drawing:
             // Player draws card from deck and add its to their hand
@@ -186,35 +143,30 @@ namespace HRTheGathering.Board
             }
 
             // Main:
-            // Player can play cards
-            // Player can attack
-            // Opposing player can assign a defender and/or play an instant card
-         
-            // Play every land card the player owns
-            while (player.Hand.Any(card => card is LandCard))
-            {
-                LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
-                if (landCard != null)
-                {
-                    player.UseCard(landCard, publisher);
-                }
-            }
+            // Player can play cards and attack
+            MainPhase(player);
 
-            // If the player has a CreatureCard, try to play it
-            CreatureCard? creatureCard = player.Hand.FirstOrDefault(card => card is CreatureCard) as CreatureCard;
-            if (creatureCard != null)
-            {
-                player.UseCardWithCost(creatureCard, publisher);
-            }
+            // Apply the spell and/or instant cards that have been played
+            ApplySpells();
 
-            bool spellCardPlayed = false;
-            // If the player has a SpellCard, try to play it
-            SpellCard? spellCard = player.Hand.FirstOrDefault(card => card is SpellCard) as SpellCard;
-            if (spellCard != null)
-            {
-                spellCardPlayed = player.UseCardWithCost(spellCard, publisher, spellStack);
-            }
+            // Try to attack the opponent
+            Attack(player);
 
+            // Ending:
+            EndTurn(player);
+            Console.WriteLine($"This is the end of the turn of {player.Name} - press any key to continue...");
+            Console.ReadKey();
+        }
+
+        private void PreparationPhase(Player player)
+        {
+            UnturnAllTurnedLandCards(player);
+            UnturnAllCreatureCards(player);
+            UpdateSpellCards(player);
+        }
+
+        private void MainPhase(Player player)
+        {
             Player opposingPlayer;
             if (player == player1)
             {
@@ -225,11 +177,20 @@ namespace HRTheGathering.Board
                 opposingPlayer = player1;
             }
 
+            // Play all lands in hand
+            PlayLands(player);
+
+            // Try to play a creature
+            PlayCreature(player);
+
+            // Try to play a spell, save if played
+            bool spellCardPlayed = PlaySpell(player);
+
             // If spell card has been played, check if the opponent has an instant card to play
             if (spellCardPlayed)
             {
                 InstantCard? instantCardOpponent = opposingPlayer.Hand.FirstOrDefault(card => card is InstantCard) as InstantCard;
-                
+
                 if (instantCardOpponent != null)
                 {
                     bool opponentNullifies = opposingPlayer.UseCardWithCost(instantCardOpponent, publisher, spellStack);
@@ -245,20 +206,45 @@ namespace HRTheGathering.Board
                     }
                 }
             }
-
-            // Apply the spell and/or instant cards that have been played
-            ApplySpells();
-
-            // Try to attack the opponent
-            Attack(player);
-
-            // Ending:
-            EndTurn(player);
-            Console.WriteLine($"This is the end of the turn of {player.Name} - press any key to continue...");
-            Console.ReadKey();
         }
 
-        public void EndTurn(Player player)
+        private void PlayLands(Player player)
+        {
+            // Play every land card the player owns
+            while (player.Hand.Any(card => card is LandCard))
+            {
+                LandCard? landCard = player.Hand.FirstOrDefault(card => card is LandCard) as LandCard;
+                if (landCard != null)
+                {
+                    player.UseCard(landCard, publisher);
+                }
+            }
+        }
+
+        private void PlayCreature(Player player)
+        {
+            // If the player has a CreatureCard, try to play it
+            CreatureCard? creatureCard = player.Hand.FirstOrDefault(card => card is CreatureCard) as CreatureCard;
+            if (creatureCard != null)
+            {
+                player.UseCardWithCost(creatureCard, publisher);
+            }
+        }
+
+        private bool PlaySpell(Player player)
+        {
+            bool spellCardPlayed = false;
+            // If the player has a SpellCard, try to play it
+            SpellCard? spellCard = player.Hand.FirstOrDefault(card => card is SpellCard) as SpellCard;
+            if (spellCard != null)
+            {
+                spellCardPlayed = player.UseCardWithCost(spellCard, publisher, spellStack);
+            }
+
+            return spellCardPlayed;
+        }
+
+        private void EndTurn(Player player)
         {
             // Player must discard cards from their hand until the cards in hand dont exceed MaxCardsInHand (7)
             while (player.Hand.Count > player.MaxCardsInHand)
@@ -278,7 +264,7 @@ namespace HRTheGathering.Board
             PrintEndSituation(player2);
         }
 
-        public void PrintEndSituation(Player player)
+        private void PrintEndSituation(Player player)
         {
             Console.WriteLine($"\n\n{player.Name}:");
             Console.WriteLine($"Cards in hand: {player.Hand.Count}");
@@ -290,7 +276,7 @@ namespace HRTheGathering.Board
             Console.WriteLine($"Lives: {player.Health}\n");
         }
 
-        public void EndGame(Player loser)
+        private void EndGame(Player loser)
         {
             // Determine the winning player
             if (loser == player1)
@@ -321,7 +307,7 @@ namespace HRTheGathering.Board
             Environment.Exit(0);
         }
 
-        public void UnturnAllTurnedLandCards(Player player)
+        private void UnturnAllTurnedLandCards(Player player)
         {
             foreach (Card card in player.CardsOnBoard)
             {
@@ -333,7 +319,7 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void UnturnAllCreatureCards(Player player)
+        private void UnturnAllCreatureCards(Player player)
         {
             foreach (Card card in player.CardsOnBoard)
             {
@@ -348,7 +334,7 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void UpdateSpellCards(Player player)
+        private void UpdateSpellCards(Player player)
         {
             for (int i = player.CardsOnBoard.Count - 1; i >= 0; i--)
             {
@@ -377,7 +363,7 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void ApplySpells()
+        private void ApplySpells()
         {
             bool nullifySpell = false;
 
@@ -456,7 +442,7 @@ namespace HRTheGathering.Board
             }
         }
 
-        public void Attack(Player attacker)
+        private void Attack(Player attacker)
         {
             Player? defender;
             CreatureCard? attackingCreature = null;
@@ -687,7 +673,7 @@ namespace HRTheGathering.Board
             EndTurn(player1);
         }
 
-        public Card GetCard(Player player, string cardName)
+        private Card GetCard(Player player, string cardName)
         {
             return player.Hand.FirstOrDefault(card => card.Name == cardName);
         }
