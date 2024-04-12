@@ -69,7 +69,7 @@ namespace HRTheGathering.Cards
                     // Add white spells
                     NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
                     deck.Add(CreateInstantCard("Divine Reprieve", 1, Color.White, nullifySpellWhite));
-                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Increases all your creatures stats by +2/+2.");
+                    ChangeStats changeStats2 = new ChangeStats(2, 2, player, publisher, "Increases all your creatures stats by +2/+2 until the start of your next turn.", 1);
                     deck.Add(CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2));
                     ChangeCardsInHand discardCard1 = new ChangeCardsInHand(-1, enemyPlayer, publisher, "Discard 1 random cards of the opponents hand.");
                     deck.Add(CreateSpellCard("Celestial Purge", 3, Color.White, discardCard1));

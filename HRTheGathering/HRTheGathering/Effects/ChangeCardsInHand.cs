@@ -10,6 +10,7 @@ namespace HRTheGathering.Effects
         private Player playerTarget;
         private Publisher publisher;
         public string Description { get; }
+        public int? Duration { get; set; }
 
         public ChangeCardsInHand(int amount, Player player, Publisher publisherTarget, string description)
         {
