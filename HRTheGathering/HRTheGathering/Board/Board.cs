@@ -4,6 +4,7 @@ using HRTheGathering.Effects;
 using HRTheGathering.Observers;
 using HRTheGathering.Players;
 using HRTheGathering.Publishers;
+using static HRTheGathering.Cards.Card;
 
 namespace HRTheGathering.Board
 {
@@ -68,6 +69,7 @@ namespace HRTheGathering.Board
 
         public void StartGame()
         {
+            // RunTests();
             PrepareGame();
 
             Console.WriteLine("Done preparing the game - press any key to start the game...");
@@ -93,6 +95,44 @@ namespace HRTheGathering.Board
                 player1.DrawCard();
                 player2.DrawCard();
             }
+        }
+
+        public void RunTests()
+        {
+            CardFactory cardFactory = new CardFactory();
+            Console.WriteLine("-------------TEST-------------");
+
+            // Creature Stats Change Test
+            CreatureCard creature1 = new CreatureCard { Name = "Creature 1", Attack = 3, Defense = 10 };
+            CreatureCard creature2 = new CreatureCard { Name = "Creature 2", Attack = 5, Defense = 6 };
+            CreatureCard creature3 = new CreatureCard { Name = "Creature 3", Attack = 4, Defense = 3 };
+            CreatureCard creature4 = new CreatureCard { Name = "Creature 4", Attack = 7, Defense = 8 };
+
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+
+            publisher.SubscribeChangeStats(creature1, player1);
+            publisher.SubscribeChangeStats(creature2, player1);
+            publisher.SubscribeChangeStats(creature3, player2);
+            publisher.SubscribeChangeStats(creature4, player2);
+
+
+            ChangeStats changeStats2 = new ChangeStats(2, 2, player1, publisher, "Increases all your creatures stats by +2/+2 until the start of the next turn.", 1);
+            SpellCard blessing = cardFactory.CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2);
+
+            ChangeStats changeStats2Perm = new ChangeStats(2, 2, player1, publisher, "Increases all your creatures stats by +2/+2.");
+            SpellCard permanentBlessing = cardFactory.CreateSpellCard("Radiant Blessing", 3, Color.White, changeStats2Perm);
+
+            player1.UseCard(blessing, publisher, spellStack);
+            player1.UseCard(permanentBlessing, publisher, spellStack);
+            ApplySpells();
+
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+            Console.ReadKey();
+
+            UpdateSpellCards(player1);
+            Console.WriteLine($"Creature1: ({creature1.Attack}, {creature1.Defense}), Creature2: ({creature2.Attack}, {creature2.Defense}), Creature3: ({creature3.Attack}, {creature3.Defense}), Creature4: ({creature4.Attack}, {creature4.Defense})");
+            Console.ReadKey();
+
         }
 
         public void DocumentTest()
@@ -277,6 +317,7 @@ namespace HRTheGathering.Board
             // Reset all Land Cards on the board
             UnturnAllTurnedLandCards(player);
             UnturnAllCreatureCards(player);
+            UpdateSpellCards(player);
 
             // Drawing:
             // Player draws card from deck and add its to their hand
@@ -360,6 +401,7 @@ namespace HRTheGathering.Board
             while (player.Hand.Count > player.MaxCardsInHand)
             {
                 Console.WriteLine($"\n{player.Name} hand exceeds max cards\n");
+
                 Random random = new Random(); 
                 // Get a random card from the hand to discard
                 int randomIndex = random.Next(player.Hand.Count);
@@ -452,6 +494,35 @@ namespace HRTheGathering.Board
                     {
                         creature.IsTurned = false;
                     }
+                }
+            }
+        }
+
+        public void UpdateSpellCards(Player player)
+        {
+            for (int i = player.CardsOnBoard.Count - 1; i >= 0; i--)
+            {
+                Card card = player.CardsOnBoard[i];
+
+                if (card is not SpellCard || card.CardEffect == null)
+                {
+                    continue;
+                }
+
+                // If card effect doesn't have a duration, its permanent, return out
+                if (card.CardEffect.Duration ==  null)
+                {
+                    continue;
+                }
+
+                // Decrement duration by 1 turn
+                card.CardEffect.DecrementDuration();
+
+                // Check if the card is expired, if so discard it
+                if (card.CardEffect.IsExpired())
+                {
+                    Console.WriteLine($"[{card.CardColor} Spell][{card.Cost}] {card.Name} ({card.CardEffect.Description}) has expired\n");
+                    player.DiscardCard(card, publisher);
                 }
             }
         }
