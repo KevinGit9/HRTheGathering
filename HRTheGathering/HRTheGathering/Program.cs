@@ -11,8 +11,10 @@ class Program
     {
         Board board = Board.Instance;
 
-        // Start the game
-        board.StartGame();
-        //board.SmallPlay();
+        // Start the game, intented automated play
+        //board.StartGame();
+
+        // Small play according to documentation
+        board.SmallPlay();
     }
 }

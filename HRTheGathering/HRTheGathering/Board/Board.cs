@@ -94,7 +94,7 @@ namespace HRTheGathering.Board
                 player2.DrawCard();
             }
         }
-        
+       
         private void RunGame()
         {
             while (winner == null)
