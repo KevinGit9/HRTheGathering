@@ -1,6 +1,5 @@
 ﻿using System;
 using HRTheGathering.Effects;
-using HRTheGathering.Players;
 
 namespace HRTheGathering.Cards
 {
