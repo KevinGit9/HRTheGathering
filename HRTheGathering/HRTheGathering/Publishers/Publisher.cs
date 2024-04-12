@@ -11,11 +11,11 @@ namespace HRTheGathering.Publishers
     {
         private static Publisher instance = new Publisher();
 
-        public event CreatureStatChangeHandler CreatureStatChangeEventPlayer1; 
-        public event CardsInHandChangeHandler CardsInHandStateChangeEventPlayer1;
+        public event CreatureStatChangeHandler CreatureStatChangeEventPlayer1 = null!; 
+        public event CardsInHandChangeHandler CardsInHandStateChangeEventPlayer1 = null!;
 
-        public event CreatureStatChangeHandler CreatureStatChangeEventPlayer2;
-        public event CardsInHandChangeHandler CardsInHandStateChangeEventPlayer2;
+        public event CreatureStatChangeHandler CreatureStatChangeEventPlayer2 = null!;
+        public event CardsInHandChangeHandler CardsInHandStateChangeEventPlayer2 = null!;
 
         public static Publisher Instance
         {

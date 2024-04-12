@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using HRTheGathering.Cards;
 using HRTheGathering.Effects;
 using HRTheGathering.Observers;
@@ -98,7 +97,19 @@ namespace HRTheGathering.Board
 
         public void DocumentTest()
         {
-            // Fill deck
+            // player 1 deck
+            player1.Deck.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Radiant Glade", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Luminous Plains", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Celestial Grove", Card.Color.White));
+            player1.Deck.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
+
+            // player 2 deck
+            player2.Deck.Add(cardFactory.CreateLandCard("Molten Peak", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Ember Highlands", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
+            player2.Deck.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
 
             // player 1 hand
             player1.Hand.Add(cardFactory.CreateLandCard("Sunlit Meadows", Card.Color.White));
@@ -106,7 +117,8 @@ namespace HRTheGathering.Board
             player1.Hand.Add(cardFactory.CreateLandCard("Luminous Plains", Card.Color.White));
             player1.Hand.Add(cardFactory.CreateLandCard("Celestial Grove", Card.Color.White));
 
-            player2.Hand.Add(cardFactory.CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 2));
+            ChangeCardsInHand discardCard1 = new ChangeCardsInHand(-1, player2, publisher, "Discard 1 random cards of the opponents hand.");
+            player1.Hand.Add(cardFactory.CreateCreatureCard("Griffon", 2, Card.Color.White, 2, 2, discardCard1));
 
             NullifySpell nullifySpellWhite = new NullifySpell("Nullify the opponents spell.");
             player1.Hand.Add(cardFactory.CreateInstantCard("Divine Reprieve", 1, Card.Color.White, nullifySpellWhite));
@@ -119,70 +131,112 @@ namespace HRTheGathering.Board
             player2.Hand.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
             player2.Hand.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
             player2.Hand.Add(cardFactory.CreateLandCard("Volcanic Crater", Card.Color.Red));
-            player2.Hand.Add(cardFactory.CreateLandCard("Blaze Ridge", Card.Color.Red));
 
             NullifySpell nullifySpellRed = new NullifySpell("Nullify the opponents spell.");
             player2.Hand.Add(cardFactory.CreateInstantCard("Flame Burst", 1, Card.Color.Red, nullifySpellRed));
 
+            NullifySpell nullifySpellRed2 = new NullifySpell("Nullify the opponents spell.");
+            player2.Hand.Add(cardFactory.CreateInstantCard("Flame Burst", 1, Card.Color.Red, nullifySpellRed2));
+
             // player 1, turn 1
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player1.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+
+            // Draw card
             player1.DrawCard();
 
+            // Use landcard
             Card landCard1Player1 = GetCard(player1, "Sunlit Meadows");
             player1.UseCard(landCard1Player1, publisher);
 
+            // Use landcard
             Card landCard2Player1 = GetCard(player1, "Radiant Glade");
             player1.UseCard(landCard2Player1, publisher);
-            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+            EndTurn();
 
             // player 2, turn 1
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player2.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+            currentRound++;
+
+            // Draw card
             player2.DrawCard();
 
+            // Use landcard
             Card landCard1Player2 = GetCard(player2, "Molten Peak");
             player2.UseCard(landCard1Player2, publisher);
-            Console.WriteLine($"Player 2: Hand:{player2.Hand.Count()}, Board:{player2.CardsOnBoard.Count()}, Health:{player2.Health}");
+            EndTurn();
 
             // player 1, turn 2
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player1.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+
+            // Unturn landcards
+            UnturnAllTurnedLandCards(player1);
+
+            // Draw card
             player1.DrawCard();
 
+            // Use landcard
             Card landCard3Player1 = GetCard(player1, "Luminous Plains");
             player1.UseCard(landCard3Player1, publisher);
 
-            LandCard landCard1Player1land = (LandCard)landCard1Player1;
-            landCard1Player1land.IsTurned = true;
-            LandCard landCard2Player1land = (LandCard)landCard2Player1;
-            landCard2Player1land.IsTurned = true;
-
-            Card creatureCard1Player1 = GetCard(player1, "Griffon"); // add effect to creature, removes random card from opponent
+            // Use creature card with discard effect
+            Card creatureCard1Player1 = GetCard(player1, "Griffon");
             CreatureCard creatureCard1Player1Creature = (CreatureCard)creatureCard1Player1;
-            player1.UseCard(creatureCard1Player1Creature, publisher);
-            // discard random card from opponent
+            player1.UseCardWithCost(creatureCard1Player1Creature, publisher);
 
-            UnturnAllTurnedLandCards(player1); // ?
-            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+            EndTurn();
 
             // player 2, turn 2
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player2.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+            currentRound++;
+
+            // Unturn landcards
+            UnturnAllTurnedLandCards(player2);
+
+            // Draw card
             player2.DrawCard();
-            Console.WriteLine($"Player 2: Hand:{player2.Hand.Count()}, Board:{player2.CardsOnBoard.Count()}, Health:{player2.Health}");
+            EndTurn();
 
             // player 1, turn 3
+            Console.WriteLine("\n\n---------------------------------------------------------------------------------------------");
+            Console.WriteLine($"\n\nTurn {currentRound}");
+            Console.WriteLine($"Player: {player1.Name}\n\n");
+            Console.WriteLine("---------------------------------------------------------------------------------------------\n\n");
+
+            // Unturn landcards
+            UnturnAllTurnedLandCards(player1);
+
+            // Draw card
             player1.DrawCard();
 
-            landCard1Player1land.IsTurned = true;
-            landCard2Player1land.IsTurned = true;
+            // Use spells
+            Card spellCard1 = GetCard(player1, "Radiant Blessing");
+            player1.UseCardWithCost(spellCard1, publisher, spellStack);
+            Card instantCard1 = GetCard(player2, "Flame Burst");
+            player2.UseCardWithCost(instantCard1, publisher, spellStack);
+            Card instantCard2 = GetCard(player1, "Divine Reprieve");
+            player1.UseCardWithCost(instantCard2, publisher, spellStack);
+            ApplySpells();
+
+            // Attack
             Attack(player1);
-            Console.WriteLine($"Player 1: Hand:{player1.Hand.Count()}, Board:{player1.CardsOnBoard.Count()}, Health:{player1.Health}");
+            EndTurn();
         }
 
         public Card GetCard(Player player, string cardName)
         {
-            foreach (Card card in player.Hand)
-            {
-                if (card.Name == cardName)
-                {
-                    return card;
-                }
-            }
-            return null;
+            return player.Hand.FirstOrDefault(card => card.Name == cardName);
         }
 
         private void RunGame()

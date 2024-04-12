@@ -8,6 +8,7 @@ class Program
         Board board = Board.Instance;
 
         // Start the game
-        board.StartGame();
+        // board.StartGame();
+        board.DocumentTest();
     }
 }

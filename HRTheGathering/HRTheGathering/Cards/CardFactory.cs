@@ -13,9 +13,9 @@ namespace HRTheGathering.Cards
             return new LandCard { Name = name, Cost = 0, CardColor = color };
         }
 
-        public CreatureCard CreateCreatureCard(string name, int cost, Color color, int attack, int defense)
+        public CreatureCard CreateCreatureCard(string name, int cost, Color color, int attack, int defense, IEffect? effect = null)
         {
-            return new CreatureCard { Name = name, Cost = cost, CardColor = color, Attack = attack, Defense = defense};
+            return new CreatureCard { Name = name, Cost = cost, CardColor = color, Attack = attack, Defense = defense, CardEffect = effect};
         }
 
         public SpellCard CreateSpellCard(string name, int cost, Color color, IEffect effect)
